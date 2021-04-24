@@ -43,6 +43,11 @@ texture={
 "flags/filter": false
 }
 
+[layer_names]
+
+2d_physics/layer_1="Player"
+2d_physics/layer_2="Tiles"
+
 [physics]
 
 common/enable_pause_aware_picking=true
@@ -54,3 +59,7 @@ vram_compression/import_etc=true
 vram_compression/import_etc2=false
 quality/shadows/filter_mode=0
 environment/default_environment="res://default_env.tres"
+
+[world]
+
+2d/cell_size=16
