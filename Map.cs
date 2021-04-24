@@ -7,10 +7,18 @@ public class Map : TileMap
     // private int a = 2;
     // private string b = "text";
 
+    public Resource tmx;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        SetTileset(tileset);
+        Label debugText = GetNode<Label>("../DebugText");
+        File f = new File();
+        if (f.Open("res://map/map.tmx", File.ModeFlags.Read) == Error.Ok)
+        {
+            string contents = f.GetAsText();
+            debugText.Text = contents;
+        }
     }
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
