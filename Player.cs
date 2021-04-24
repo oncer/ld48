@@ -1,14 +1,9 @@
 using Godot;
-using GodotProject;
 using System;
+using static Globals;
 
 public class Player : KinematicBody2D
 {
-    public enum PlayerState
-    {
-        Idle, Walk, Jump, DigSide, DigDown, Die
-    }
-
     private AnimatedSprite animatedSprite;
 
     // Called when the node enters the scene tree for the first time.
