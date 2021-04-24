@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using static Globals;
 
 public class Game : Node2D
 {
@@ -13,7 +14,7 @@ public class Game : Node2D
 	public override void _Ready()
 	{
 		player = GetNode<Player>("Player");
-		player.State = Player.PlayerState.DigDown;
+		player.State = PlayerState.DigSide;
 	}
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
