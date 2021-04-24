@@ -15,4 +15,4 @@ player states:
 * dig left/right/down
 
 game engine:
-* monogame
+* godot (mono / C#)
