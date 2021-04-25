@@ -27,6 +27,8 @@ public class Player : KinematicBody2D
     private const float FloorDetectDistance = 20.0f;
     private RayCast2D platformDetector;
 
+    private float ghostTime = 1000f;
+
     private Label debugText;
 
     // Called when the node enters the scene tree for the first time.
@@ -39,8 +41,36 @@ public class Player : KinematicBody2D
         map = GetNode<Map>("..");
         debugText = GetNode<Label>("Z/DebugText");
 
-
         animatedSprite.Connect("animation_finished", this, "OnFinished");
+    }
+
+    public void death() {
+        //GetTree().ReloadCurrentScene();
+        State = PlayerState.Die;
+        // if (State == PlayerState.Die) {
+        //     while (ghostTime > 0) {
+        //         State = PlayerState.Die;
+        //         ghostTime -= delta;
+        //         Vector2 move = new Vector2(0.0f, 20f);
+        //         MoveAndSlide(move, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
+        //     }
+        // }
+    }
+
+    public override void _Process(float delta)
+    {
+        if (State == PlayerState.Die) {
+            if(ghostTime > 0) {
+                ghostTime -= 0.1f;
+            }
+            else {
+                ghostTime = 1000f;
+                State = PlayerState.Idle;
+                Position = new Vector2(50f,16f);
+            }
+            
+        }
+        
     }
 
     public override void _PhysicsProcess(float delta)
@@ -51,7 +81,7 @@ public class Player : KinematicBody2D
         bool isOnCeil = IsOnCeiling();
         bool isOnWall = IsOnWall();
 
-        if (State != PlayerState.DigDown && State != PlayerState.DigSide)
+        if (State != PlayerState.DigDown && State != PlayerState.DigSide && State != PlayerState.Die)
         {
 
             // MOVE RIGHT && LEFT
@@ -115,19 +145,25 @@ public class Player : KinematicBody2D
                 State = PlayerState.DigDown;
             }
 
-        if(Input.IsActionPressed("ui_select")) {
-            var effect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
-            var node = effect.Instance<Node>();
-            AddChild(node);            
-        }
-
-        animatedSprite.FlipH = (Direction == Direction.Left);
-
-            if (State == PlayerState.JumpUp)
+            if (Input.IsActionPressed("ui_focus_next"))
             {
-                if (speedY >= 0)
-                    State = PlayerState.JumpDown;
+                death();
             }
+
+
+            if(Input.IsActionPressed("ui_select")) {
+                var effect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
+                var node = effect.Instance<Node>();
+                AddChild(node);            
+            }
+
+            animatedSprite.FlipH = (Direction == Direction.Left);
+
+                if (State == PlayerState.JumpUp)
+                {
+                    if (speedY >= 0)
+                        State = PlayerState.JumpDown;
+                }
         }
 
         animatedSprite.FlipH = (Direction == Direction.Left);
