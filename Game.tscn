@@ -1,23 +1,24 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=27 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Map.cs" type="Script" id=2]
 [ext_resource path="res://gfx/player.png" type="Texture" id=3]
 [ext_resource path="res://Player.cs" type="Script" id=4]
+[ext_resource path="res://gfx/background.png" type="Texture" id=5]
 
-[sub_resource type="AtlasTexture" id=1]
+[sub_resource type="AtlasTexture" id=22]
 atlas = ExtResource( 3 )
 region = Rect2( 0, 0, 32, 32 )
 
-[sub_resource type="AtlasTexture" id=2]
+[sub_resource type="AtlasTexture" id=23]
 atlas = ExtResource( 3 )
 region = Rect2( 32, 0, 32, 32 )
 
-[sub_resource type="AtlasTexture" id=3]
+[sub_resource type="AtlasTexture" id=24]
 atlas = ExtResource( 3 )
-region = Rect2( 32, 64, 32, 32 )
+region = Rect2( 64, 0, 32, 32 )
 
-[sub_resource type="AtlasTexture" id=4]
+[sub_resource type="AtlasTexture" id=25]
 atlas = ExtResource( 3 )
 region = Rect2( 96, 0, 32, 32 )
 
@@ -35,35 +36,35 @@ region = Rect2( 64, 96, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=8]
 atlas = ExtResource( 3 )
-region = Rect2( 0, 32, 32, 32 )
+region = Rect2( 0, 64, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=9]
 atlas = ExtResource( 3 )
-region = Rect2( 32, 32, 32, 32 )
+region = Rect2( 0, 160, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=10]
 atlas = ExtResource( 3 )
-region = Rect2( 64, 32, 32, 32 )
+region = Rect2( 0, 32, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=11]
 atlas = ExtResource( 3 )
-region = Rect2( 96, 32, 32, 32 )
+region = Rect2( 32, 32, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=12]
 atlas = ExtResource( 3 )
-region = Rect2( 128, 32, 32, 32 )
+region = Rect2( 64, 32, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=13]
 atlas = ExtResource( 3 )
-region = Rect2( 160, 32, 32, 32 )
+region = Rect2( 96, 32, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=14]
 atlas = ExtResource( 3 )
-region = Rect2( 32, 64, 32, 32 )
+region = Rect2( 128, 32, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=15]
 atlas = ExtResource( 3 )
-region = Rect2( 0, 64, 32, 32 )
+region = Rect2( 160, 32, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=16]
 atlas = ExtResource( 3 )
@@ -79,34 +80,34 @@ region = Rect2( 64, 128, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=19]
 atlas = ExtResource( 3 )
-region = Rect2( 0, 160, 32, 32 )
+region = Rect2( 32, 64, 32, 32 )
 
 [sub_resource type="SpriteFrames" id=20]
 animations = [ {
-"frames": [ SubResource( 1 ), SubResource( 2 ), SubResource( 3 ), SubResource( 4 ) ],
+"frames": [ SubResource( 22 ), SubResource( 23 ), SubResource( 24 ), SubResource( 25 ) ],
 "loop": true,
 "name": "idle",
-"speed": 5.0
+"speed": 6.0
 }, {
 "frames": [ SubResource( 5 ), SubResource( 6 ), SubResource( 7 ) ],
 "loop": true,
 "name": "digDown",
 "speed": 7.5
 }, {
-"frames": [ SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ) ],
-"loop": true,
-"name": "walk",
-"speed": 8.0
-}, {
-"frames": [ SubResource( 14 ) ],
-"loop": true,
-"name": "jumpDown",
-"speed": 5.0
-}, {
-"frames": [ SubResource( 15 ) ],
+"frames": [ SubResource( 8 ) ],
 "loop": true,
 "name": "jumpUp",
 "speed": 5.0
+}, {
+"frames": [ SubResource( 9 ) ],
+"loop": true,
+"name": "die",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ), SubResource( 15 ) ],
+"loop": true,
+"name": "walk",
+"speed": 8.0
 }, {
 "frames": [ SubResource( 16 ), SubResource( 17 ), SubResource( 18 ) ],
 "loop": true,
@@ -115,7 +116,7 @@ animations = [ {
 }, {
 "frames": [ SubResource( 19 ) ],
 "loop": true,
-"name": "die",
+"name": "jumpDown",
 "speed": 5.0
 } ]
 
@@ -151,6 +152,17 @@ collision_mask = 2
 position = Vector2( 0, -3 )
 current = true
 process_mode = 0
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="Map/Player/Camera"]
+follow_viewport_enable = true
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="Map/Player/Camera/ParallaxBackground"]
+motion_scale = Vector2( 0.5, 0 )
+motion_mirroring = Vector2( 320, 0 )
+
+[node name="Sprite" type="Sprite" parent="Map/Player/Camera/ParallaxBackground/ParallaxLayer"]
+texture = ExtResource( 5 )
+centered = false
 
 [node name="DebugText" type="Label" parent="."]
 margin_right = 40.0
