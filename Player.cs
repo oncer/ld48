@@ -32,6 +32,8 @@ public class Player : KinematicBody2D
     private float maxSpeedX = 100;
     private float dragX = .1f;
     private float accX = 10f;
+
+    private Camera2D camera;
     //private bool isOnPlatform = true;
     
     public Direction Direction {get; private set; }
@@ -101,10 +103,8 @@ public class Player : KinematicBody2D
 	    if (direction.y == 0.0f) {
 		    snapVector = Vector2.Down * FloorDetectDistance;
         }    
-        
         velocity.x = speedX;
         velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
-    
     }    
 
     // Called when the node enters the scene tree for the first time.
@@ -112,8 +112,8 @@ public class Player : KinematicBody2D
     {
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
         platformDetector = GetNode<RayCast2D>("PlatformDetector");
-
-
+        camera = GetNode<Camera2D>("Camera");
+        camera.CustomViewport = GetNode("../..");
     }
 
     private PlayerState state;

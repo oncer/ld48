@@ -12,6 +12,12 @@ public class Map : Node2D
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        Camera2D camera = GetNode<Camera2D>("Player/Camera");
+        camera.LimitLeft = 0;
+        camera.LimitRight = 16 * 40;
+        camera.LimitTop = 0;
+        camera.LimitBottom = 500 * 40;
+
         Label debugText = GetNode<Label>("../DebugText");
         File f = new File();
         string mapPath = "res://map/";
@@ -63,6 +69,8 @@ public class Map : Node2D
                     continue;
                 }
                 TileMap map = new TileMap();//GetNode<TileMap>(layerName);
+                map.CollisionLayer = 1<<1;
+                map.CollisionMask = 0;
                 map.CellSize = new Vector2(tileWidth, tileHeight);
                 //if (map == null) continue;
                 GD.Print($"Loading layer {layerName}.");
