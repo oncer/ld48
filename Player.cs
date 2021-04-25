@@ -30,8 +30,8 @@ public class Player : KinematicBody2D
     [Export]
     private float speedX, speedY;
     private float maxSpeedX = 100;
-    private float dragX = .1f;
-    private float accX = 10f;
+    private float dragX = .7f;
+    private const float accX = 20f;
 
     private Camera2D camera;
     //private bool isOnPlatform = true;
@@ -39,7 +39,7 @@ public class Player : KinematicBody2D
     public Direction Direction {get; private set; }
 
     Vector2 velocity = new Vector2(0.0f, 0.0f);
-    float Gravity = 800.0f;
+    float Gravity = 600.0f;
     const float FloorDetectDistance = 20.0f;
     RayCast2D platformDetector;
 
@@ -86,7 +86,7 @@ public class Player : KinematicBody2D
 
         if (Input.IsActionPressed("ui_up")) {
             if (isOnFloor){
-                velocity.y = -200f;
+                speedY = -200f;
                 State = PlayerState.JumpUp;
             }
         }
@@ -96,16 +96,25 @@ public class Player : KinematicBody2D
                 State = PlayerState.JumpDown;
         }
 
-        velocity.y += Gravity * delta;
+        velocity.x = speedX;
+        speedY += Gravity * delta;
+        //velocity.y = speedY + Gravity ;
+        velocity.y = speedY;
 
         Vector2 direction = new Vector2(0.0f, 0.0f); // TODO input goes here
         Vector2 snapVector = Vector2.Zero;
 	    if (direction.y == 0.0f) {
 		    snapVector = Vector2.Down * FloorDetectDistance;
         }    
-        velocity.x = speedX;
+        
         velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
-    }    
+
+        if (velocity.x == 0)
+        {
+            speedX = 0;
+        }
+        
+    }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
