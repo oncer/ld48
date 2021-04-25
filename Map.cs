@@ -1,5 +1,6 @@
 using Godot;
 using System.Xml;
+using System.Collections.Generic;
 
 public class Map : Node2D
 {
@@ -8,6 +9,20 @@ public class Map : Node2D
     // private string b = "text";
 
     public Resource tmx;
+
+    private string ResolvePath(string path)
+    {
+        List<string> partsList = new List<string>(path.Split(new char[]{'/'}, System.StringSplitOptions.None));
+        for (int i = 1; i < partsList.Count; i++) {
+            if (partsList[i] == "..") {
+                i--;
+                partsList.RemoveAt(i);
+                partsList.RemoveAt(i);
+                i--;
+            }
+        }
+        return string.Join("/", partsList);
+    }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -39,7 +54,10 @@ public class Map : Node2D
             int tilesetWidth = int.Parse(tilesetNode["image"].Attributes["width"].Value);
             int tilesetHeight = int.Parse(tilesetNode["image"].Attributes["height"].Value);
 
-            tilesetPath = mapPath + tilesetPath;
+            tilesetPath = System.IO.Path.Combine(mapPath, tilesetPath);
+            GD.Print(tilesetPath);
+            tilesetPath = ResolvePath(tilesetPath);
+            GD.Print(tilesetPath);
             Texture tilesetTexture = GD.Load<Texture>(tilesetPath);
             GD.Print($"Loaded Tileset texture {tilesetPath} {tilesetTexture.GetWidth()}x{tilesetTexture.GetHeight()}");
             TileSet tileset = new TileSet();
