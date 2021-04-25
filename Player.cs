@@ -29,7 +29,7 @@ public class Player : KinematicBody2D
         
     [Export]
     private float speedX, speedY;
-    private float maxSpeedX = 200;
+    private float maxSpeedX = 100;
     private float dragX = .1f;
     private float accX = 10f;
     //private bool isOnPlatform = true;
@@ -48,13 +48,12 @@ public class Player : KinematicBody2D
         debug = GetNode<Label>("../../DebugText");
 
         bool isOnPlatform = platformDetector.IsColliding();
+        bool isOnFloor = IsOnFloor();
 
-        debug.Text = isOnPlatform.ToString();
+        debug.Text = isOnFloor.ToString();
           // MOVE RIGHT && LEFT
-         if (Input.IsActionPressed("ui_left"))
-        {
-            
-            if (!isOnPlatform){
+         if (Input.IsActionPressed("ui_left")) {
+            if (!isOnFloor){
                 speedX = Math.Max(speedX - dragX * accX, -maxSpeedX);
             } else {
                 State = PlayerState.Walk;
@@ -63,9 +62,8 @@ public class Player : KinematicBody2D
 
             if (speedX <= 0) Direction = Direction.Left;
         }
-        else if (Input.IsActionPressed("ui_right"))
-        {
-            if (!isOnPlatform){
+        else if (Input.IsActionPressed("ui_right")) {
+            if (!isOnFloor){
                 speedX = Math.Min(speedX + dragX * accX, maxSpeedX);
             } else {
                 State = PlayerState.Walk;
@@ -74,11 +72,10 @@ public class Player : KinematicBody2D
 
             if (speedX >= 0) Direction = Direction.Right;
         } else {
-            speedX *= .97f;
-                if (isOnPlatform)
-                    State = PlayerState.Idle;
+            speedX *= .7f;
+            if (isOnFloor)
+                State = PlayerState.Idle;
             if (Math.Abs(speedX) < .2f) {
-
                 speedX = 0;
             }
         }
@@ -86,8 +83,7 @@ public class Player : KinematicBody2D
         animatedSprite.FlipH = (Direction == Direction.Left);
 
         if (Input.IsActionPressed("ui_up")) {
-            if (isOnPlatform){
-                isOnPlatform = false;
+            if (isOnFloor){
                 speedY = -40f;
                 State = PlayerState.JumpUp;
             }
