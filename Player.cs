@@ -37,7 +37,7 @@ public class Player : KinematicBody2D
     public Direction Direction {get; private set; }
 
     Vector2 velocity = new Vector2(0.0f, 0.0f);
-    float Gravity = 600.0f;
+    float Gravity = 800.0f;
     const float FloorDetectDistance = 20.0f;
     RayCast2D platformDetector;
 
@@ -84,7 +84,7 @@ public class Player : KinematicBody2D
 
         if (Input.IsActionPressed("ui_up")) {
             if (isOnFloor){
-                speedY = -40f;
+                velocity.y = -200f;
                 State = PlayerState.JumpUp;
             }
         }
