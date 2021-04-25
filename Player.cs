@@ -196,7 +196,7 @@ public class Player : KinematicBody2D
         if (tileType == EarthTileType.Unknown)
             return false;
 
-        if ((int)tileType <= shovelPower)
+        if ((int)tileType <= ShovelPower)
         {
             map.ClearEarthTileAt(digPoint);
             return true;

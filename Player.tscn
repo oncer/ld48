@@ -99,17 +99,12 @@ animations = [ {
 "frames": [ SubResource( 14 ), SubResource( 15 ), SubResource( 16 ) ],
 "loop": true,
 "name": "digSide",
-"speed": 10.0
+"speed": 7.5
 }, {
 "frames": [ SubResource( 17 ) ],
 "loop": true,
 "name": "jumpDown",
 "speed": 5.0
-}, {
-"frames": [ SubResource( 15 ), SubResource( 16 ), SubResource( 17 ) ],
-"loop": false,
-"name": "digDown",
-"speed": 10.0
 }, {
 "frames": [ SubResource( 18 ) ],
 "loop": true,
