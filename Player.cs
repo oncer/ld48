@@ -72,22 +72,36 @@ public class Player : KinematicBody2D
         }
         
     }
+    bool hasJumped = false;
+    bool hitHead = false;
 
     public override void _PhysicsProcess(float delta)
     {
-        bool ididajump = false;
         bool isOnPlatform = platformDetector.IsColliding();
         bool isOnFloor = IsOnFloor();
         bool isOnCeil = IsOnCeiling();
         bool isOnWall = IsOnWall();
 
+        bool onGround = isOnFloor || isOnPlatform;
+
+        if (isOnCeil)
+            hitHead = true;
+
+        if (onGround)
+            hasJumped = false;
+
         if (State != PlayerState.DigDown && State != PlayerState.DigSide && State != PlayerState.Die)
         {
+
+            if (!isOnFloor && (State == PlayerState.Walk || State == PlayerState.Idle))
+            {
+                State = speedY < 0 ? PlayerState.JumpUp : PlayerState.JumpDown;
+            }
 
             // MOVE RIGHT && LEFT
             if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right"))
             {
-                if (!isOnFloor)
+                if (!onGround)
                 {
                     speedX = Math.Max(speedX - dragX * accX, -maxSpeedX);
                 }
@@ -101,7 +115,7 @@ public class Player : KinematicBody2D
             }
             else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left"))
             {
-                if (!isOnFloor)
+                if (!onGround)
                 {
                     speedX = Math.Min(speedX + dragX * accX, maxSpeedX);
                 }
@@ -116,7 +130,7 @@ public class Player : KinematicBody2D
             else
             {
                 speedX *= .7f;
-                if (isOnFloor)
+                if (onGround)
                     State = PlayerState.Idle;
                 if (Math.Abs(speedX) < .2f)
                 {
@@ -124,24 +138,39 @@ public class Player : KinematicBody2D
                 }
             }
 
+            // dig side
+            if (onGround && /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
+            {
+                if (Dig(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
+                {
+                    State = PlayerState.DigSide;
+                }
+            }
+
             if (Input.IsActionPressed("ui_up"))
             {
-                if (isOnFloor)
+                if (!hasJumped && !hitHead)
                 {
                     speedY = -180f;
                     State = PlayerState.JumpUp;
-                    ididajump = true;
+                    hasJumped = true;
                 }
                 gravity = GravityJump;
             }
             else
             {
+                hitHead = false;
                 gravity = GravityDefault;
             }
 
-            if (Input.IsActionJustPressed("ui_down"))
+            if (Input.IsActionPressed("ui_down") && isOnFloor && State != PlayerState.DigSide)
             {
-                //Dig(Vector2.Down);
+                var hasDigged = Dig(Vector2.Down);
+
+                if (hasDigged)
+                {
+                    hasJumped = false;
+                }
                 State = PlayerState.DigDown;
             }
 
@@ -158,12 +187,16 @@ public class Player : KinematicBody2D
             }
 
             animatedSprite.FlipH = (Direction == Direction.Left);
-
-                if (State == PlayerState.JumpUp)
-                {
-                    if (speedY >= 0)
-                        State = PlayerState.JumpDown;
-                }
+            
+            if (State == PlayerState.JumpUp)
+            {
+                if (speedY >= 0)
+                    State = PlayerState.JumpDown;
+            }
+        } else // digging:
+        {
+            speedX = 0;
+            speedY = -gravity * delta;
         }
 
         animatedSprite.FlipH = (Direction == Direction.Left);
@@ -182,43 +215,55 @@ public class Player : KinematicBody2D
 
         if (isOnWall) speedX = 0;
         if (isOnCeil) speedY = Math.Max(speedY, 0);
-        if (isOnFloor && !ididajump) speedY = 0;
+        if (isOnFloor && !hasJumped) speedY = 0;
 
     }
 
     public void OnFinished()
     {
-        if (State == PlayerState.DigDown)
+        if (State == PlayerState.DigDown || State == PlayerState.DigSide)
         {
-            Dig(Vector2.Down);
             State = PlayerState.Idle;            
         }
+    }
+
+    bool CheckAndClearAt(Vector2 digPoint)
+    {
+        var tileType = map.GetEarthTileAt(digPoint);
+        if (tileType == EarthTileType.Unknown)
+            return false;
+
+        if ((int)tileType <= shovelPower)
+        {
+            map.ClearEarthTileAt(digPoint);
+            return true;
+        }
+
+        return false;
     }
 
     //
     //  dir is a unit vector, either Vector2.Left, Vector2.Right, Vector2.Down
     //
-    private void Dig(Vector2 dir)
+    private bool Dig(Vector2 dir)
     {
         Node2D collision = GetNode<Node2D>("Collision");
         Vector2 digPoint = collision.GlobalPosition;
+        
         if (dir == Vector2.Left) {
-            digPoint += new Vector2(-8, 0);
+            return CheckAndClearAt(collision.GlobalPosition + new Vector2(-8, 0));            
         } else if (dir == Vector2.Right) {
-            digPoint += new Vector2(8, 0);
+            return CheckAndClearAt(collision.GlobalPosition + new Vector2(8, 0));            
         } else if (dir == Vector2.Down) {
-            digPoint += new Vector2(0, 10);
-        }
-        EarthTileType et = map.GetEarthTileAt(digPoint);
-        //debugText.Text = $"{et.ToString()} {(int)digPoint.x},{(int)digPoint.y}";
-
-        if (et == EarthTileType.Unknown)
-            return;
-
-        if ((int)et <= shovelPower)
-        {
-            map.ClearEarthTileAt(digPoint);
-        }
+            for(int i = -2; i <= 2; i+= 2)
+            {
+                digPoint = collision.GlobalPosition + new Vector2(i, 10);
+                var s = CheckAndClearAt(digPoint);
+                if (s == true)
+                    return s;
+            }            
+        }        
+        return false;
     }
 
     private PlayerState state;
