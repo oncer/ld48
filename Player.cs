@@ -88,6 +88,12 @@ public class Player : KinematicBody2D
             }
         }
 
+        if(Input.IsActionPressed("ui_select")) {
+            var effect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
+            var node = effect.Instance<Node>();
+            AddChild(node);            
+        }
+
         animatedSprite.FlipH = (Direction == Direction.Left);
 
         if (Input.IsActionPressed("ui_up")) {

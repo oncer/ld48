@@ -29,4 +29,15 @@ public static class Utils
                 throw new NotImplementedException();
         }
     }
+
+    public static string GetString(this EffectState a)
+    {
+        switch (a)
+        {
+            case EffectState.Poof:
+                return "poof";  
+            default:
+                throw new NotImplementedException();
+        }
+    }
 }
