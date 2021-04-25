@@ -15,7 +15,7 @@ public class Player : KinematicBody2D
 
     private Camera2D camera;
 
-    private int shovelPower = 1;
+    public int ShovelPower {get; set;} = 1;
     
     public Direction Direction {get; private set; }
 
@@ -175,7 +175,7 @@ public class Player : KinematicBody2D
         if (et == EarthTileType.Unknown)
             return;
 
-        if ((int)et <= shovelPower)
+        if ((int)et <= ShovelPower)
         {
             map.ClearEarthTileAt(digPoint);
         }
