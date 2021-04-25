@@ -27,12 +27,6 @@ public class Map : Node2D
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        Camera2D camera = GetNode<Camera2D>("Player/Camera");
-        camera.LimitLeft = 0;
-        camera.LimitRight = 16 * 40;
-        camera.LimitTop = 0;
-        camera.LimitBottom = 500 * 40;
-
         Label debugText = GetNode<Label>("../DebugText");
         File f = new File();
         string mapPath = "res://map/";
