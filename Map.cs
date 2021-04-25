@@ -21,7 +21,6 @@ public class Map : Node2D
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(f.GetAsText());
             XmlElement root = xmlDoc.DocumentElement;
-            GD.Print(root.Attributes["tilewidth"].Value);
             int tileWidth = int.Parse(root.Attributes["tilewidth"].Value);
             int tileHeight = int.Parse(root.Attributes["tileheight"].Value);
             int width = int.Parse(root.Attributes["width"].Value);
@@ -38,11 +37,20 @@ public class Map : Node2D
             Texture tilesetTexture = GD.Load<Texture>(tilesetPath);
             GD.Print($"Loaded Tileset texture {tilesetPath} {tilesetTexture.GetWidth()}x{tilesetTexture.GetHeight()}");
             TileSet tileset = new TileSet();
-            tileset.CreateTile(0);
-            tileset.TileSetTexture(0, tilesetTexture);
-            tileset.TileSetTileMode(0, TileSet.TileMode.AtlasTile);
-            tileset.AutotileSetSize(0, new Vector2(tileWidth, tileHeight));
-            tileset.TileSetRegion(0, new Rect2(0, 0, tilesetWidth, tilesetHeight));
+            for (int i = 0; i < tilesetCount; i++) {
+                tileset.CreateTile(i);
+                tileset.TileSetTexture(i, tilesetTexture);
+                tileset.TileSetTileMode(i, TileSet.TileMode.SingleTile);
+                tileset.TileSetRegion(i, new Rect2((i % tilesetColumns) * tileWidth, (i / tilesetColumns) * tileHeight, tileWidth, tileHeight));
+                //tileset.TileSetTextureOffset(i, new Vector2((i % tilesetColumns) * tileWidth, (i / tilesetColumns) * tileHeight));
+                //tileset.AutotileSetSize(0, new Vector2(tileWidth, tileHeight));
+                ConvexPolygonShape2D shape = new ConvexPolygonShape2D();
+                shape.Points = new Vector2[]{
+                    new Vector2(0, 0), new Vector2(16, 0),
+                    new Vector2(16, 16), new Vector2(0, 16)
+                };
+                tileset.TileSetShape(i, 0, shape);
+            }
 
             foreach (XmlNode layer in root.SelectNodes("layer"))
             {
@@ -70,7 +78,7 @@ public class Map : Node2D
                         string dataStrCell = dataStrCells[y * width + x];
                         int tileId = int.Parse(dataStrCell) - firstgid;
                         if (tileId >= 0) {
-                            map.SetCell(x, y, 0, false, false, false, new Vector2(tileId % tilesetColumns, tileId / tilesetColumns));
+                            map.SetCell(x, y, tileId, false, false, false);
                             tileCount++;
                         }
                     }
