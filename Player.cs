@@ -26,8 +26,7 @@ func _physics_process(delta):
 public class Player : KinematicBody2D
 {
     private AnimatedSprite animatedSprite;
-        
-    [Export]
+    
     private float speedX, speedY;
     private float maxSpeedX = 100;
     private float dragX = .7f;
@@ -38,23 +37,30 @@ public class Player : KinematicBody2D
     
     public Direction Direction {get; private set; }
 
-    Vector2 velocity = new Vector2(0.0f, 0.0f);
-    float Gravity = 600.0f;
-    const float FloorDetectDistance = 20.0f;
-    RayCast2D platformDetector;
+    private Vector2 velocity = new Vector2(0.0f, 0.0f);
+    private const float GravityDefault = 700.0f;
+    private const float GravityJump = 400.0f;
+    private float gravity = GravityDefault;
+
+    private const float FloorDetectDistance = 20.0f;
+    private RayCast2D platformDetector;
 
     public override void _PhysicsProcess(float delta)
     {
+
+        bool ididajump = false;
 
         Label debug;
         debug = GetNode<Label>("../../DebugText");
 
         bool isOnPlatform = platformDetector.IsColliding();
         bool isOnFloor = IsOnFloor();
+        bool isOnCeil = IsOnCeiling();
+        bool isOnWall = IsOnWall();
 
         debug.Text = isOnFloor.ToString();
           // MOVE RIGHT && LEFT
-         if (Input.IsActionPressed("ui_left")) {
+         if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right")) {
             if (!isOnFloor){
                 speedX = Math.Max(speedX - dragX * accX, -maxSpeedX);
             } else {
@@ -64,7 +70,7 @@ public class Player : KinematicBody2D
 
             if (speedX <= 0) Direction = Direction.Left;
         }
-        else if (Input.IsActionPressed("ui_right")) {
+        else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left")) {
             if (!isOnFloor){
                 speedX = Math.Min(speedX + dragX * accX, maxSpeedX);
             } else {
@@ -85,10 +91,14 @@ public class Player : KinematicBody2D
         animatedSprite.FlipH = (Direction == Direction.Left);
 
         if (Input.IsActionPressed("ui_up")) {
-            if (isOnFloor){
-                speedY = -200f;
+            if (isOnFloor) {
+                speedY = -180f;
                 State = PlayerState.JumpUp;
+                ididajump = true;
             }
+            gravity = GravityJump;
+        } else {
+            gravity = GravityDefault;
         }
 
         if (State == PlayerState.JumpUp){
@@ -97,23 +107,32 @@ public class Player : KinematicBody2D
         }
 
         velocity.x = speedX;
-        speedY += Gravity * delta;
-        //velocity.y = speedY + Gravity ;
+        speedY += gravity * delta;
         velocity.y = speedY;
 
         Vector2 direction = new Vector2(0.0f, 0.0f); // TODO input goes here
         Vector2 snapVector = Vector2.Zero;
 	    if (direction.y == 0.0f) {
 		    snapVector = Vector2.Down * FloorDetectDistance;
-        }    
+        }
         
         velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
 
-        if (velocity.x == 0)
+        if (isOnWall)
         {
             speedX = 0;
         }
-        
+
+        if (isOnCeil)
+        {
+            speedY = Math.Max(speedY, 0);
+        }
+
+        if (isOnFloor && !ididajump)
+        {
+            speedY = 0;
+        }
+
     }
 
     // Called when the node enters the scene tree for the first time.
