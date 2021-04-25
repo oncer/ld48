@@ -15,7 +15,7 @@ public class Player : KinematicBody2D
 
     private Camera2D camera;
 
-    private int shovelPower = 1;
+    public int ShovelPower {get; set;} = 1;
     
     public Direction Direction {get; private set; }
 
