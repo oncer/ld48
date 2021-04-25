@@ -1,127 +1,9 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Map.cs" type="Script" id=2]
-[ext_resource path="res://gfx/player.png" type="Texture" id=3]
-[ext_resource path="res://Player.cs" type="Script" id=4]
+[ext_resource path="res://Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://gfx/background.png" type="Texture" id=5]
-
-[sub_resource type="AtlasTexture" id=20]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 0, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=21]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 0, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=22]
-atlas = ExtResource( 3 )
-region = Rect2( 64, 0, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=23]
-atlas = ExtResource( 3 )
-region = Rect2( 96, 0, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=24]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=25]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=26]
-atlas = ExtResource( 3 )
-region = Rect2( 64, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=27]
-atlas = ExtResource( 3 )
-region = Rect2( 96, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=28]
-atlas = ExtResource( 3 )
-region = Rect2( 128, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=29]
-atlas = ExtResource( 3 )
-region = Rect2( 160, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=30]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 96, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=31]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 96, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=32]
-atlas = ExtResource( 3 )
-region = Rect2( 64, 96, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=33]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 128, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=34]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 128, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=35]
-atlas = ExtResource( 3 )
-region = Rect2( 64, 128, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=40]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 64, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=36]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 64, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=37]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 160, 32, 32 )
-
-[sub_resource type="SpriteFrames" id=38]
-animations = [ {
-"frames": [ SubResource( 20 ), SubResource( 21 ), SubResource( 22 ), SubResource( 23 ) ],
-"loop": true,
-"name": "idle",
-"speed": 6.0
-}, {
-"frames": [ SubResource( 24 ), SubResource( 25 ), SubResource( 26 ), SubResource( 27 ), SubResource( 28 ), SubResource( 29 ) ],
-"loop": true,
-"name": "walk",
-"speed": 8.0
-}, {
-"frames": [ SubResource( 30 ), SubResource( 31 ), SubResource( 32 ) ],
-"loop": true,
-"name": "digDown",
-"speed": 7.5
-}, {
-"frames": [ SubResource( 33 ), SubResource( 34 ), SubResource( 35 ) ],
-"loop": true,
-"name": "digSide",
-"speed": 7.5
-}, {
-"frames": [ SubResource( 40 ) ],
-"loop": true,
-"name": "jumpDown",
-"speed": 5.0
-}, {
-"frames": [ SubResource( 36 ) ],
-"loop": true,
-"name": "jumpUp",
-"speed": 5.0
-}, {
-"frames": [ SubResource( 37 ) ],
-"loop": true,
-"name": "die",
-"speed": 5.0
-} ]
-
-[sub_resource type="RectangleShape2D" id=39]
-extents = Vector2( 3.5, 5 )
 
 [node name="Game" type="Node2D"]
 script = ExtResource( 1 )
@@ -144,34 +26,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2( 0, 0, 1280, 8000 )
 
-[node name="Player" type="KinematicBody2D" parent="Map"]
-position = Vector2( 50, 16 )
-collision_mask = 2
-script = ExtResource( 4 )
-
-[node name="AnimatedSprite" type="AnimatedSprite" parent="Map/Player"]
-z_index = 1
-frames = SubResource( 38 )
-animation = "idle"
-
-[node name="Collision" type="CollisionShape2D" parent="Map/Player"]
-position = Vector2( 0, 3 )
-shape = SubResource( 39 )
-
-[node name="PlatformDetector" type="RayCast2D" parent="Map/Player"]
-position = Vector2( 0, 8 )
-cast_to = Vector2( 0, 3 )
-collision_mask = 2
-
-[node name="Camera" type="Camera2D" parent="Map/Player"]
-position = Vector2( 0, -3 )
-current = true
-process_mode = 0
-limit_left = 0
-limit_top = 0
-limit_right = 640
-limit_bottom = 8000
-limit_smoothed = true
+[node name="Player" parent="Map" instance=ExtResource( 3 )]
 
 [node name="DebugText" type="Label" parent="."]
 margin_right = 40.0
