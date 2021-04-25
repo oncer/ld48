@@ -27,10 +27,18 @@ region_enabled = true
 region_rect = Rect2( 0, 0, 1280, 8000 )
 
 [node name="Player" parent="Map" instance=ExtResource( 3 )]
+position = Vector2( 50, 16 )
 
-[node name="DebugText" type="Label" parent="."]
-margin_right = 40.0
-margin_bottom = 14.0
+[node name="Z" type="Node2D" parent="Map/Player"]
+z_index = 4
+
+[node name="DebugText" type="Label" parent="Map/Player/Z"]
+margin_left = -37.0
+margin_top = -16.0
+margin_right = 38.0
+margin_bottom = -2.0
+text = "Asdf"
+align = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
