@@ -146,7 +146,11 @@ public class Player : KinematicBody2D
 
     public void OnFinished()
     {
-        GD.Print("HALLOOOOO");
+        if (State == PlayerState.DigDown)
+        {
+            Dig(Vector2.Down);
+            State = PlayerState.Idle;            
+        }
     }
 
     //
