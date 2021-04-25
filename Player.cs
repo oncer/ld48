@@ -27,7 +27,7 @@ public class Player : KinematicBody2D
     private const float FloorDetectDistance = 20.0f;
     private RayCast2D platformDetector;
 
-    private float ghostTime = 1000f;
+    private float ghostTime = 1f;
 
     private Label debugText;
 
@@ -61,11 +61,17 @@ public class Player : KinematicBody2D
     {
         if (State == PlayerState.Die) {
             if(ghostTime > 0) {
-                ghostTime -= 0.1f;
+                ghostTime -= delta;
+                gravity = 0f;
+                speedY = -200f;
+                speedX = 0;
             }
             else {
-                ghostTime = 1000f;
+                ghostTime = 1f;
                 State = PlayerState.Idle;
+                gravity = GravityDefault;
+                speedY = 0;
+                speedX = 0;
                 Position = new Vector2(50f,16f);
             }
             
@@ -90,113 +96,115 @@ public class Player : KinematicBody2D
         if (onGround)
             hasJumped = false;
 
-        if (State != PlayerState.DigDown && State != PlayerState.DigSide && State != PlayerState.Die)
-        {
-
-            if (!isOnFloor && (State == PlayerState.Walk || State == PlayerState.Idle))
+        if (State != PlayerState.Die) {
+            if (State != PlayerState.DigDown && State != PlayerState.DigSide)
             {
-                State = speedY < 0 ? PlayerState.JumpUp : PlayerState.JumpDown;
-            }
 
-            // MOVE RIGHT && LEFT
-            if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right"))
-            {
-                if (!onGround)
+                if (!isOnFloor && (State == PlayerState.Walk || State == PlayerState.Idle))
                 {
-                    speedX = Math.Max(speedX - dragX * accX, -maxSpeedX);
+                    State = speedY < 0 ? PlayerState.JumpUp : PlayerState.JumpDown;
+                }
+
+                // MOVE RIGHT && LEFT
+                if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right"))
+                {
+                    if (!onGround)
+                    {
+                        speedX = Math.Max(speedX - dragX * accX, -maxSpeedX);
+                    }
+                    else
+                    {
+                        State = PlayerState.Walk;
+                        speedX = Math.Max(speedX - accX, -maxSpeedX);
+                    }
+
+                    if (speedX <= 0) Direction = Direction.Left;
+                }
+                else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left"))
+                {
+                    if (!onGround)
+                    {
+                        speedX = Math.Min(speedX + dragX * accX, maxSpeedX);
+                    }
+                    else
+                    {
+                        State = PlayerState.Walk;
+                        speedX = Math.Min(speedX + accX, maxSpeedX);
+                    }
+
+                    if (speedX >= 0) Direction = Direction.Right;
                 }
                 else
                 {
-                    State = PlayerState.Walk;
-                    speedX = Math.Max(speedX - accX, -maxSpeedX);
+                    speedX *= .7f;
+                    if (onGround)
+                        State = PlayerState.Idle;
+                    if (Math.Abs(speedX) < .2f)
+                    {
+                        speedX = 0;
+                    }
                 }
 
-                if (speedX <= 0) Direction = Direction.Left;
-            }
-            else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left"))
-            {
-                if (!onGround)
+                // dig side
+                if (onGround && /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
                 {
-                    speedX = Math.Min(speedX + dragX * accX, maxSpeedX);
+                    if (Dig(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
+                    {
+                        State = PlayerState.DigSide;
+                    }
+                }
+
+                if (Input.IsActionPressed("ui_up"))
+                {
+                    if (!hasJumped && !hitHead)
+                    {
+                        speedY = -180f;
+                        State = PlayerState.JumpUp;
+                        hasJumped = true;
+                    }
+                    gravity = GravityJump;
                 }
                 else
                 {
-                    State = PlayerState.Walk;
-                    speedX = Math.Min(speedX + accX, maxSpeedX);
+                    hitHead = false;
+                    gravity = GravityDefault;
                 }
 
-                if (speedX >= 0) Direction = Direction.Right;
-            }
-            else
-            {
-                speedX *= .7f;
-                if (onGround)
-                    State = PlayerState.Idle;
-                if (Math.Abs(speedX) < .2f)
+                if (Input.IsActionPressed("ui_down") && isOnFloor && State != PlayerState.DigSide)
                 {
-                    speedX = 0;
-                }
-            }
+                    var hasDigged = Dig(Vector2.Down);
 
-            // dig side
-            if (onGround && /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
-            {
-                if (Dig(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
+                    if (hasDigged)
+                    {
+                        hasJumped = false;
+                    }
+                    State = PlayerState.DigDown;
+                }
+
+                if (Input.IsActionPressed("ui_focus_next"))
                 {
-                    State = PlayerState.DigSide;
+                    death();
                 }
-            }
 
-            if (Input.IsActionPressed("ui_up"))
-            {
-                if (!hasJumped && !hitHead)
+
+                if(Input.IsActionPressed("ui_select")) {
+                    var effect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
+                    var node = effect.Instance<Node>();
+                    AddChild(node);            
+                }
+
+                animatedSprite.FlipH = (Direction == Direction.Left);
+
+                if (State == PlayerState.JumpUp)
                 {
-                    speedY = -180f;
-                    State = PlayerState.JumpUp;
-                    hasJumped = true;
+                    if (speedY >= 0)
+                        State = PlayerState.JumpDown;
                 }
-                gravity = GravityJump;
-            }
-            else
+            } else // digging:
             {
-                hitHead = false;
-                gravity = GravityDefault;
+                speedX = 0;
+                speedY = -gravity * delta;
             }
-
-            if (Input.IsActionPressed("ui_down") && isOnFloor && State != PlayerState.DigSide)
-            {
-                var hasDigged = Dig(Vector2.Down);
-
-                if (hasDigged)
-                {
-                    hasJumped = false;
-                }
-                State = PlayerState.DigDown;
-            }
-
-            if (Input.IsActionPressed("ui_focus_next"))
-            {
-                death();
-            }
-
-
-            if(Input.IsActionPressed("ui_select")) {
-                var effect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
-                var node = effect.Instance<Node>();
-                AddChild(node);            
-            }
-
-            animatedSprite.FlipH = (Direction == Direction.Left);
-            
-            if (State == PlayerState.JumpUp)
-            {
-                if (speedY >= 0)
-                    State = PlayerState.JumpDown;
-            }
-        } else // digging:
-        {
-            speedX = 0;
-            speedY = -gravity * delta;
         }
 
         animatedSprite.FlipH = (Direction == Direction.Left);
