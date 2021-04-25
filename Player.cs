@@ -2,43 +2,60 @@ using Godot;
 using System;
 using static Globals;
 
+/*
+export var speed = Vector2(150.0, 350.0)
+onready var gravity = ProjectSettings.get("physics/2d/default_gravity")
+
+const FLOOR_NORMAL = Vector2.UP
+
+var _velocity = Vector2.ZERO
+
+# _physics_process is called after the inherited _physics_process function.
+# This allows the Player and Enemy scenes to be affected by gravity.
+func _physics_process(delta):
+	_velocity.y += gravity * delta
+
+    var snap_vector = Vector2.ZERO
+	if direction.y == 0.0:
+		snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE
+	var is_on_platform = platform_detector.is_colliding()
+	_velocity = move_and_slide_with_snap(
+		_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4, 0.9, false
+	)
+    */
 public class Player : KinematicBody2D
 {
     private AnimatedSprite animatedSprite;
         
     [Export]
     private float speedX, speedY;
-    private float maxSpeedX = 50;
-    private float accX = .5f;
-    private bool onGround = true;
+    private float maxSpeedX = 200;
+    private float dragX = .1f;
+    private float accX = 10f;
+    //private bool isOnPlatform = true;
     
     public Direction Direction {get; private set; }
 
-    // Called when the node enters the scene tree for the first time.
-    
-    private PlayerState state;
-    public PlayerState State 
+    Vector2 velocity = new Vector2(0.0f, 0.0f);
+    float Gravity = 600.0f;
+    const float FloorDetectDistance = 20.0f;
+    RayCast2D platformDetector;
+
+    public override void _PhysicsProcess(float delta)
     {
-        get => state;
-        set
+
+        Label debug;
+        debug = GetNode<Label>("../../DebugText");
+
+        bool isOnPlatform = platformDetector.IsColliding();
+
+        debug.Text = isOnPlatform.ToString();
+          // MOVE RIGHT && LEFT
+         if (Input.IsActionPressed("ui_left"))
         {
-            animatedSprite.Play(value.GetString());
-            state = value;
-        }
-    }
-
-    public override void _Ready()
-    {
-        animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
-    }
-
-    public override void _Process(float delta)
-    {
-
-        if (Input.IsActionPressed("ui_left"))
-        {
-            if (!onGround){
-                speedX = Math.Max(speedX - .2f * accX, -maxSpeedX);
+            
+            if (!isOnPlatform){
+                speedX = Math.Max(speedX - dragX * accX, -maxSpeedX);
             } else {
                 State = PlayerState.Walk;
                 speedX = Math.Max(speedX - accX, -maxSpeedX);
@@ -48,8 +65,8 @@ public class Player : KinematicBody2D
         }
         else if (Input.IsActionPressed("ui_right"))
         {
-            if (!onGround){
-                speedX = Math.Min(speedX + .2f * accX, maxSpeedX);
+            if (!isOnPlatform){
+                speedX = Math.Min(speedX + dragX * accX, maxSpeedX);
             } else {
                 State = PlayerState.Walk;
                 speedX = Math.Min(speedX + accX, maxSpeedX);
@@ -58,7 +75,7 @@ public class Player : KinematicBody2D
             if (speedX >= 0) Direction = Direction.Right;
         } else {
             speedX *= .97f;
-                if (onGround)
+                if (isOnPlatform)
                     State = PlayerState.Idle;
             if (Math.Abs(speedX) < .2f) {
 
@@ -69,8 +86,8 @@ public class Player : KinematicBody2D
         animatedSprite.FlipH = (Direction == Direction.Left);
 
         if (Input.IsActionPressed("ui_up")) {
-            if (onGround){
-                onGround = false;
+            if (isOnPlatform){
+                isOnPlatform = false;
                 speedY = -40f;
                 State = PlayerState.JumpUp;
             }
@@ -81,8 +98,37 @@ public class Player : KinematicBody2D
                 State = PlayerState.JumpDown;
         }
 
-        Position += new Vector2(speedX, speedY) * delta;
-     
+        velocity.y += Gravity * delta;
+
+        Vector2 direction = new Vector2(0.0f, 0.0f); // TODO input goes here
+        Vector2 snapVector = Vector2.Zero;
+	    if (direction.y == 0.0f) {
+		    snapVector = Vector2.Down * FloorDetectDistance;
+        }    
+        
+        velocity.x = speedX;
+        velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
+    
+    }    
+
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
+    {
+        animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
+        platformDetector = GetNode<RayCast2D>("PlatformDetector");
+
+
+    }
+
+    private PlayerState state;
+    public PlayerState State 
+    {
+        get => state;
+        set
+        {
+            animatedSprite.Play(value.GetString());
+            state = value;
+        }
     }
 
 }
