@@ -29,68 +29,102 @@ public class Player : KinematicBody2D
 
     private Label debugText;
 
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
+    {
+        animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
+        platformDetector = GetNode<RayCast2D>("PlatformDetector");
+        camera = GetNode<Camera2D>("Camera");
+        camera.CustomViewport = GetNode("../..");
+        map = GetNode<Map>("..");
+        debugText = GetNode<Label>("Z/DebugText");
+
+
+        animatedSprite.Connect("animation_finished", this, "OnFinished");
+    }
+
     public override void _PhysicsProcess(float delta)
     {
         bool ididajump = false;
-
-        Dig(Vector2.Down);
-
         bool isOnPlatform = platformDetector.IsColliding();
         bool isOnFloor = IsOnFloor();
         bool isOnCeil = IsOnCeiling();
         bool isOnWall = IsOnWall();
 
-          // MOVE RIGHT && LEFT
-         if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right")) {
-            if (!isOnFloor){
-                speedX = Math.Max(speedX - dragX * accX, -maxSpeedX);
-            } else {
-                State = PlayerState.Walk;
-                speedX = Math.Max(speedX - accX, -maxSpeedX);
+        if (State != PlayerState.DigDown && State != PlayerState.DigSide)
+        {
+
+            // MOVE RIGHT && LEFT
+            if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right"))
+            {
+                if (!isOnFloor)
+                {
+                    speedX = Math.Max(speedX - dragX * accX, -maxSpeedX);
+                }
+                else
+                {
+                    State = PlayerState.Walk;
+                    speedX = Math.Max(speedX - accX, -maxSpeedX);
+                }
+
+                if (speedX <= 0) Direction = Direction.Left;
+            }
+            else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left"))
+            {
+                if (!isOnFloor)
+                {
+                    speedX = Math.Min(speedX + dragX * accX, maxSpeedX);
+                }
+                else
+                {
+                    State = PlayerState.Walk;
+                    speedX = Math.Min(speedX + accX, maxSpeedX);
+                }
+
+                if (speedX >= 0) Direction = Direction.Right;
+            }
+            else
+            {
+                speedX *= .7f;
+                if (isOnFloor)
+                    State = PlayerState.Idle;
+                if (Math.Abs(speedX) < .2f)
+                {
+                    speedX = 0;
+                }
             }
 
-            if (speedX <= 0) Direction = Direction.Left;
-        }
-        else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left")) {
-            if (!isOnFloor){
-                speedX = Math.Min(speedX + dragX * accX, maxSpeedX);
-            } else {
-                State = PlayerState.Walk;
-                speedX = Math.Min(speedX + accX, maxSpeedX);
+            if (Input.IsActionPressed("ui_up"))
+            {
+                if (isOnFloor)
+                {
+                    speedY = -180f;
+                    State = PlayerState.JumpUp;
+                    ididajump = true;
+                }
+                gravity = GravityJump;
+            }
+            else
+            {
+                gravity = GravityDefault;
             }
 
-            if (speedX >= 0) Direction = Direction.Right;
-        } else {
-            speedX *= .7f;
-            if (isOnFloor)
-                State = PlayerState.Idle;
-            if (Math.Abs(speedX) < .2f) {
-                speedX = 0;
+            if (Input.IsActionJustPressed("ui_down"))
+            {
+                //Dig(Vector2.Down);
+                State = PlayerState.DigDown;
+            }
+
+            //if (State == PlayerState.DigDown && animatedSprite.conn)
+
+            if (State == PlayerState.JumpUp)
+            {
+                if (speedY >= 0)
+                    State = PlayerState.JumpDown;
             }
         }
 
         animatedSprite.FlipH = (Direction == Direction.Left);
-
-        if (Input.IsActionPressed("ui_up")) {
-            if (isOnFloor) {
-                speedY = -180f;
-                State = PlayerState.JumpUp;
-                ididajump = true;
-            }
-            gravity = GravityJump;
-        } else {
-            gravity = GravityDefault;
-        }
-
-        if (Input.IsActionPressed("ui_down"))
-        {
-            Dig(Vector2.Down);            
-        }
-
-        if (State == PlayerState.JumpUp){
-            if (speedY >= 0)
-                State = PlayerState.JumpDown;
-        }
 
         velocity.x = speedX;
         speedY += gravity * delta;
@@ -110,15 +144,9 @@ public class Player : KinematicBody2D
 
     }
 
-    // Called when the node enters the scene tree for the first time.
-    public override void _Ready()
+    public void OnFinished()
     {
-        animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
-        platformDetector = GetNode<RayCast2D>("PlatformDetector");
-        camera = GetNode<Camera2D>("Camera");
-        camera.CustomViewport = GetNode("../..");
-        map = GetNode<Map>("..");
-        debugText = GetNode<Label>("Z/DebugText");
+        GD.Print("HALLOOOOO");
     }
 
     //
@@ -136,9 +164,15 @@ public class Player : KinematicBody2D
             digPoint += new Vector2(0, 10);
         }
         EarthTileType et = map.GetEarthTileAt(digPoint);
-        debugText.Text = $"{et.ToString()} {(int)digPoint.x},{(int)digPoint.y}";
+        //debugText.Text = $"{et.ToString()} {(int)digPoint.x},{(int)digPoint.y}";
 
-        if ()
+        if (et == EarthTileType.Unknown)
+            return;
+
+        if ((int)et <= shovelPower)
+        {
+            map.ClearEarthTileAt(digPoint);
+        }
     }
 
     private PlayerState state;
