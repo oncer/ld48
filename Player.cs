@@ -26,6 +26,8 @@ func _physics_process(delta):
 public class Player : KinematicBody2D
 {
     private AnimatedSprite animatedSprite;
+
+    private Map map;
     
     private float speedX, speedY;
     private float maxSpeedX = 100;
@@ -45,20 +47,19 @@ public class Player : KinematicBody2D
     private const float FloorDetectDistance = 20.0f;
     private RayCast2D platformDetector;
 
+    private Label debugText;
+
     public override void _PhysicsProcess(float delta)
     {
-
         bool ididajump = false;
 
-        Label debug;
-        debug = GetNode<Label>("../../DebugText");
+        Dig(Vector2.Down);
 
         bool isOnPlatform = platformDetector.IsColliding();
         bool isOnFloor = IsOnFloor();
         bool isOnCeil = IsOnCeiling();
         bool isOnWall = IsOnWall();
 
-        debug.Text = isOnFloor.ToString();
           // MOVE RIGHT && LEFT
          if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right")) {
             if (!isOnFloor){
@@ -142,6 +143,26 @@ public class Player : KinematicBody2D
         platformDetector = GetNode<RayCast2D>("PlatformDetector");
         camera = GetNode<Camera2D>("Camera");
         camera.CustomViewport = GetNode("../..");
+        map = GetNode<Map>("..");
+        debugText = GetNode<Label>("Z/DebugText");
+    }
+
+    //
+    //  dir is a unit vector, either Vector2.Left, Vector2.Right, Vector2.Down
+    //
+    private void Dig(Vector2 dir)
+    {
+        Node2D collision = GetNode<Node2D>("Collision");
+        Vector2 digPoint = collision.GlobalPosition;
+        if (dir == Vector2.Left) {
+            digPoint += new Vector2(-8, 0);
+        } else if (dir == Vector2.Right) {
+            digPoint += new Vector2(8, 0);
+        } else if (dir == Vector2.Down) {
+            digPoint += new Vector2(0, 10);
+        }
+        EarthTileType et = map.GetEarthTileAt(digPoint);
+        debugText.Text = $"{et.ToString()} {(int)digPoint.x},{(int)digPoint.y}";
     }
 
     private PlayerState state;

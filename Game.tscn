@@ -1,127 +1,9 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Map.cs" type="Script" id=2]
-[ext_resource path="res://gfx/player.png" type="Texture" id=3]
-[ext_resource path="res://Player.cs" type="Script" id=4]
+[ext_resource path="res://Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://gfx/background.png" type="Texture" id=5]
-
-[sub_resource type="AtlasTexture" id=1]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 0, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=2]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 0, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=3]
-atlas = ExtResource( 3 )
-region = Rect2( 64, 0, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=4]
-atlas = ExtResource( 3 )
-region = Rect2( 96, 0, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=5]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 64, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=6]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 128, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=7]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 128, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=8]
-atlas = ExtResource( 3 )
-region = Rect2( 64, 128, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=9]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 160, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=10]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=11]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=12]
-atlas = ExtResource( 3 )
-region = Rect2( 64, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=13]
-atlas = ExtResource( 3 )
-region = Rect2( 96, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=14]
-atlas = ExtResource( 3 )
-region = Rect2( 128, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=15]
-atlas = ExtResource( 3 )
-region = Rect2( 160, 32, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=16]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 96, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=17]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 96, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=18]
-atlas = ExtResource( 3 )
-region = Rect2( 64, 96, 32, 32 )
-
-[sub_resource type="AtlasTexture" id=19]
-atlas = ExtResource( 3 )
-region = Rect2( 32, 64, 32, 32 )
-
-[sub_resource type="SpriteFrames" id=20]
-animations = [ {
-"frames": [ SubResource( 1 ), SubResource( 2 ), SubResource( 3 ), SubResource( 4 ) ],
-"loop": true,
-"name": "idle",
-"speed": 6.0
-}, {
-"frames": [ SubResource( 5 ) ],
-"loop": true,
-"name": "jumpUp",
-"speed": 5.0
-}, {
-"frames": [ SubResource( 6 ), SubResource( 7 ), SubResource( 8 ) ],
-"loop": true,
-"name": "digSide",
-"speed": 7.5
-}, {
-"frames": [ SubResource( 9 ) ],
-"loop": true,
-"name": "die",
-"speed": 5.0
-}, {
-"frames": [ SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ), SubResource( 15 ) ],
-"loop": true,
-"name": "walk",
-"speed": 8.0
-}, {
-"frames": [ SubResource( 16 ), SubResource( 17 ), SubResource( 18 ) ],
-"loop": true,
-"name": "digDown",
-"speed": 7.5
-}, {
-"frames": [ SubResource( 19 ) ],
-"loop": true,
-"name": "jumpDown",
-"speed": 5.0
-} ]
-
-[sub_resource type="RectangleShape2D" id=21]
-extents = Vector2( 3.5, 5 )
 
 [node name="Game" type="Node2D"]
 script = ExtResource( 1 )
@@ -133,8 +15,8 @@ script = ExtResource( 2 )
 follow_viewport_enable = true
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="Map/ParallaxBackground"]
-position = Vector2( -240, -96 )
-motion_scale = Vector2( -0.5, 0 )
+position = Vector2( 0, -96 )
+motion_scale = Vector2( 0.2, 0 )
 motion_mirroring = Vector2( 1280, 0 )
 
 [node name="Sprite" type="Sprite" parent="Map/ParallaxBackground/ParallaxLayer"]
@@ -142,40 +24,21 @@ z_index = -1
 texture = ExtResource( 5 )
 centered = false
 region_enabled = true
-region_rect = Rect2( 0, 0, 960, 8000 )
+region_rect = Rect2( 0, 0, 1280, 8000 )
 
-[node name="Player" type="KinematicBody2D" parent="Map"]
+[node name="Player" parent="Map" instance=ExtResource( 3 )]
 position = Vector2( 50, 16 )
-collision_mask = 2
-script = ExtResource( 4 )
 
-[node name="AnimatedSprite" type="AnimatedSprite" parent="Map/Player"]
-z_index = 1
-frames = SubResource( 20 )
-animation = "idle"
+[node name="Z" type="Node2D" parent="Map/Player"]
+z_index = 4
 
-[node name="Collision" type="CollisionShape2D" parent="Map/Player"]
-position = Vector2( 0, 3 )
-shape = SubResource( 21 )
-
-[node name="PlatformDetector" type="RayCast2D" parent="Map/Player"]
-position = Vector2( 0, 8 )
-cast_to = Vector2( 0, 3 )
-collision_mask = 2
-
-[node name="Camera" type="Camera2D" parent="Map/Player"]
-position = Vector2( 0, -3 )
-current = true
-process_mode = 0
-limit_left = 0
-limit_top = 0
-limit_right = 640
-limit_bottom = 8000
-limit_smoothed = true
-
-[node name="DebugText" type="Label" parent="."]
-margin_right = 40.0
-margin_bottom = 14.0
+[node name="DebugText" type="Label" parent="Map/Player/Z"]
+margin_left = -37.0
+margin_top = -16.0
+margin_right = 38.0
+margin_bottom = -2.0
+text = "Asdf"
+align = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
