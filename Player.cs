@@ -4,32 +4,29 @@ using static Globals;
 
 public class Player : KinematicBody2D
 {
-    private AnimatedSprite animatedSprite;
+    public int ShovelPower { get; set; } = 1;
+    public Direction Direction { get; private set; }
 
-    private Map map;
-    
+    private AnimatedSprite animatedSprite;
+    private Map map;    
     private float speedX, speedY;
     private float maxSpeedX = 100;
     private float dragX = .7f;
     private const float accX = 20f;
-
     private Camera2D camera;
-
-    public int ShovelPower {get; set;} = 1;
-    
-    public Direction Direction {get; private set; }
-
     private Vector2 velocity = new Vector2(0.0f, 0.0f);
     private const float GravityDefault = 700.0f;
     private const float GravityJump = 400.0f;
     private float gravity = GravityDefault;
-
     private const float FloorDetectDistance = 20.0f;
     private RayCast2D platformDetector;
-
-    private float ghostTime = 1f;
-
+    private const float maxGhostTime = 3f; // seconds
+    private float ghostTime = maxGhostTime;
+    private double ghostSin = Math.PI;
     private Label debugText;
+    private Vector2 originalPosition;
+    private bool hasJumped = false;
+    private bool hitHead = false;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -42,44 +39,8 @@ public class Player : KinematicBody2D
         debugText = GetNode<Label>("Z/DebugText");
 
         animatedSprite.Connect("animation_finished", this, "OnFinished");
+        originalPosition = Position;
     }
-
-    public void death() {
-        //GetTree().ReloadCurrentScene();
-        State = PlayerState.Die;
-        // if (State == PlayerState.Die) {
-        //     while (ghostTime > 0) {
-        //         State = PlayerState.Die;
-        //         ghostTime -= delta;
-        //         Vector2 move = new Vector2(0.0f, 20f);
-        //         MoveAndSlide(move, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
-        //     }
-        // }
-    }
-
-    public override void _Process(float delta)
-    {
-        if (State == PlayerState.Die) {
-            if(ghostTime > 0) {
-                ghostTime -= delta;
-                gravity = 0f;
-                speedY = -200f;
-                speedX = 0;
-            }
-            else {
-                ghostTime = 1f;
-                State = PlayerState.Idle;
-                gravity = GravityDefault;
-                speedY = 0;
-                speedX = 0;
-                Position = new Vector2(50f,16f);
-            }
-            
-        }
-        
-    }
-    bool hasJumped = false;
-    bool hitHead = false;
 
     public override void _PhysicsProcess(float delta)
     {
@@ -183,7 +144,9 @@ public class Player : KinematicBody2D
 
                 if (Input.IsActionPressed("ui_focus_next"))
                 {
-                    death();
+                    speedX = 0;
+                    speedY = 0;
+                    State = PlayerState.Die;
                 }
 
 
@@ -205,6 +168,27 @@ public class Player : KinematicBody2D
                 speedX = 0;
                 speedY = -gravity * delta;
             }
+        } else // dead:
+        {
+            gravity = 0f;
+            ghostSin = (ghostSin + .1f) % (2 * Math.PI);
+            speedX = (float)Math.Sin(ghostSin) * 60;
+            speedY = Math.Max(speedY - 3f, -100f);
+            
+            ghostTime = Math.Max(ghostTime - delta, 0);
+            if (ghostTime == 0 || Position.y <= 0)
+            {
+                ghostSin = Math.PI;
+                ghostTime = maxGhostTime;
+                State = PlayerState.Idle;
+                gravity = GravityDefault;
+                speedY = 0;
+                speedX = 0;
+                hasJumped = false;
+                hitHead = false;
+
+                Position = originalPosition;
+            }
         }
 
         animatedSprite.FlipH = (Direction == Direction.Left);
@@ -218,7 +202,9 @@ public class Player : KinematicBody2D
 	    if (direction.y == 0.0f) {
 		    snapVector = Vector2.Down * FloorDetectDistance;
         }
-        
+
+        Position = new Vector2(Mathf.Clamp(Position.x, 8, 640 - 8), Position.y);
+
         velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
 
         if (isOnWall) speedX = 0;
