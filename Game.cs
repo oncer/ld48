@@ -14,7 +14,7 @@ public class Game : Node2D
 	public override void _Ready()
 	{
 		player = GetNode<Player>("Player");
-		player.State = PlayerState.DigSide;
+		player.State = PlayerState.Idle;
 	}
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -16,3 +16,13 @@ player states:
 
 game engine:
 * godot (mono / C#)
+
+
+------
+
+next steps: 
+* player <-> tilemap interaction, player logic (physics, controls, states...)
+* test level design & redesign
+* enemy logic, object logic
+* effects, enemy sprites, animations etc.
+* background
