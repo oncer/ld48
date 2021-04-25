@@ -22,8 +22,8 @@ region = Rect2( 48, 0, 16, 16 )
 [sub_resource type="SpriteFrames" id=5]
 animations = [ {
 "frames": [ SubResource( 1 ), SubResource( 2 ), SubResource( 3 ), SubResource( 4 ) ],
-"loop": true,
-"name": "New Anim",
+"loop": false,
+"name": "poof",
 "speed": 15.0
 } ]
 
@@ -31,5 +31,6 @@ animations = [ {
 script = ExtResource( 2 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( 3, 0 )
 frames = SubResource( 5 )
-animation = "New Anim"
+animation = "poof"

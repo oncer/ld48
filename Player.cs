@@ -115,7 +115,13 @@ public class Player : KinematicBody2D
                 State = PlayerState.DigDown;
             }
 
-            //if (State == PlayerState.DigDown && animatedSprite.conn)
+        if(Input.IsActionPressed("ui_select")) {
+            var effect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
+            var node = effect.Instance<Node>();
+            AddChild(node);            
+        }
+
+        animatedSprite.FlipH = (Direction == Direction.Left);
 
             if (State == PlayerState.JumpUp)
             {
