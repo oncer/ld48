@@ -102,7 +102,7 @@ public class Player : KinematicBody2D
         Vector2 snapVector = Vector2.Zero;
 	    if (direction.y == 0.0f) {
 		    snapVector = Vector2.Down * FloorDetectDistance;
-        }    
+        }
         velocity.x = speedX;
         velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
     }    
