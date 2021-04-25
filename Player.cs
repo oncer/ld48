@@ -2,27 +2,6 @@ using Godot;
 using System;
 using static Globals;
 
-/*
-export var speed = Vector2(150.0, 350.0)
-onready var gravity = ProjectSettings.get("physics/2d/default_gravity")
-
-const FLOOR_NORMAL = Vector2.UP
-
-var _velocity = Vector2.ZERO
-
-# _physics_process is called after the inherited _physics_process function.
-# This allows the Player and Enemy scenes to be affected by gravity.
-func _physics_process(delta):
-	_velocity.y += gravity * delta
-
-    var snap_vector = Vector2.ZERO
-	if direction.y == 0.0:
-		snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE
-	var is_on_platform = platform_detector.is_colliding()
-	_velocity = move_and_slide_with_snap(
-		_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 4, 0.9, false
-	)
-    */
 public class Player : KinematicBody2D
 {
     private AnimatedSprite animatedSprite;
@@ -35,7 +14,8 @@ public class Player : KinematicBody2D
     private const float accX = 20f;
 
     private Camera2D camera;
-    //private bool isOnPlatform = true;
+
+    private int shovelPower = 1;
     
     public Direction Direction {get; private set; }
 
@@ -102,6 +82,11 @@ public class Player : KinematicBody2D
             gravity = GravityDefault;
         }
 
+        if (Input.IsActionPressed("ui_down"))
+        {
+            Dig(Vector2.Down);            
+        }
+
         if (State == PlayerState.JumpUp){
             if (speedY >= 0)
                 State = PlayerState.JumpDown;
@@ -119,20 +104,9 @@ public class Player : KinematicBody2D
         
         velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
 
-        if (isOnWall)
-        {
-            speedX = 0;
-        }
-
-        if (isOnCeil)
-        {
-            speedY = Math.Max(speedY, 0);
-        }
-
-        if (isOnFloor && !ididajump)
-        {
-            speedY = 0;
-        }
+        if (isOnWall) speedX = 0;
+        if (isOnCeil) speedY = Math.Max(speedY, 0);
+        if (isOnFloor && !ididajump) speedY = 0;
 
     }
 
@@ -163,6 +137,8 @@ public class Player : KinematicBody2D
         }
         EarthTileType et = map.GetEarthTileAt(digPoint);
         debugText.Text = $"{et.ToString()} {(int)digPoint.x},{(int)digPoint.y}";
+
+        if ()
     }
 
     private PlayerState state;
