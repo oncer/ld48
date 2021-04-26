@@ -57,6 +57,13 @@ public class Player : KinematicBody2D
         score += value;
     }
 
+    public void Kill()
+    {
+        speedX = 0;
+        speedY = 0;
+        State = PlayerState.Die;
+    }
+
     public override void _PhysicsProcess(float delta)
     {
         bool isOnPlatform = platformDetector.IsColliding();
@@ -159,9 +166,7 @@ public class Player : KinematicBody2D
 
                 if (Input.IsActionPressed("ui_focus_next"))
                 {
-                    speedX = 0;
-                    speedY = 0;
-                    State = PlayerState.Die;
+                    Kill();
                 }
 
                 animatedSprite.FlipH = (Direction == Direction.Left);
