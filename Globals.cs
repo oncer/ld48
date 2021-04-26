@@ -13,10 +13,5 @@ public static class Globals
     public enum PlayerState
     {
         Idle, Walk, JumpUp, JumpDown, DigSide, DigDown, Die
-    }
-    public enum EffectType
-    {
-        None,
-        Poof
-    }
+    }    
 }

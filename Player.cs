@@ -235,7 +235,7 @@ public class Player : KinematicBody2D
             map.ClearEarthTileAt(digPoint);
 
             var eff = destroyEffect.Instance<DestroyEffect>();
-            eff.EffectType = EffectType.Poof;
+            eff.EffectName = "destroyBlock";
 
             var x = ((int)digPoint.x / 16) * 16 + 8;
             var y = ((int)digPoint.y / 16) * 16 + 8;
