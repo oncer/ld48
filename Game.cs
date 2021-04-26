@@ -9,6 +9,7 @@ public class Game : Node2D
 	// private string b = "text";
 
 	private Player player;
+	private Label scoreText;
 
 	private TutorialText tutorialText;
 
@@ -17,10 +18,18 @@ public class Game : Node2D
 	{
 		tutorialText = GetNode<TutorialText>("CanvasLayer/TutorialText");
 		player = GetNode<Player>("Map/Player");
+		scoreText = GetNode<Label>("CanvasLayer/ScoreHUD/ScoreText");
 		player.State = PlayerState.Idle;
 
 		ShowTutorialText("Find the shovel!");
 	}
+
+    public void UpdateScoreText()
+    {
+        scoreText.Text = "Score: " + player.Score;
+    }
+
+    
 
 	public void ShowTutorialText(string text)
 	{
