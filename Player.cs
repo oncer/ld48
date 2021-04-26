@@ -6,6 +6,7 @@ public class Player : KinematicBody2D
 {
     public int ShovelPower { get; set; } = 0;
     public Direction Direction { get; private set; }
+    public Vector2 SpawnPosition { get; set; }
 
     private AnimatedSprite animatedSprite;
     private Map map;    
@@ -25,7 +26,7 @@ public class Player : KinematicBody2D
     private float ghostTime = maxGhostTime;
     private double ghostSin = .5f * Math.PI;
     private Label debugText;
-    private Vector2 originalPosition;
+    
     private bool hasJumped = false;
     private bool hitHead = false;
 
@@ -55,7 +56,7 @@ public class Player : KinematicBody2D
         debugText = GetNode<Label>("Z/DebugText");
 
         animatedSprite.Connect("animation_finished", this, "OnFinished");
-        originalPosition = Position;
+        SpawnPosition = Position;
     }
 
     public void AcquireCoin(int value)
@@ -245,7 +246,7 @@ public class Player : KinematicBody2D
                 hasJumped = false;
                 hitHead = false;
 
-                Position = originalPosition;
+                Position = SpawnPosition;
             }
         }
 
