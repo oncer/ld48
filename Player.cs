@@ -7,7 +7,6 @@ public class Player : KinematicBody2D
     public int ShovelPower { get; set; } = 1;
     public Direction Direction { get; private set; }
 
-    private PackedScene destroyEffect;
     private AnimatedSprite animatedSprite;
     private Map map;    
     private float speedX, speedY;
@@ -29,15 +28,12 @@ public class Player : KinematicBody2D
     private bool hasJumped = false;
     private bool hitHead = false;
 
-    Node2D scene;
-
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        scene = GetNode<Node2D>("..");
+        Globals.Scene = GetNode<Node2D>("..");
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
         platformDetector = GetNode<RayCast2D>("PlatformDetector");
-        destroyEffect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
         
         camera = GetNode<Camera2D>("Camera");
         camera.CustomViewport = GetNode("../..");
@@ -234,14 +230,7 @@ public class Player : KinematicBody2D
         {
             map.ClearEarthTileAt(digPoint);
 
-            var eff = destroyEffect.Instance<DestroyEffect>();
-            eff.EffectName = "destroyBlock";
-
-            var x = ((int)digPoint.x / 16) * 16 + 8;
-            var y = ((int)digPoint.y / 16) * 16 + 8;
-
-            eff.Position = new Vector2(x, y);
-            scene.AddChild(eff);
+            Globals.CreateEffect("destroyBlock", digPoint);
 
             return true;
         }
