@@ -39,15 +39,23 @@ public class Map : Node2D
     public override string ToString() {
         return $"Tilemap {width}x{height} with {layers.Count} layers.";
     }
-    public EarthTileType GetEarthTileAt(Vector2 pos)
+
+    public int GetTileAt(Vector2 pos)
     {
         TileMap fgMap = layers["FG"];
+        return fgMap.GetCellv(new Vector2(pos.x / tileWidth, pos.y / tileHeight));
+    }
+    public EarthTileType GetEarthTileAt(Vector2 pos)
+    {
         HashSet<int> easyIndices = new HashSet<int>(new int[]{32, 33, 34, 35, 36});
         HashSet<int> mediumIndices = new HashSet<int>(new int[]{48, 49, 50, 51});
         HashSet<int> hardIndices = new HashSet<int>(new int[]{64, 65, 66, 67, 68});
         HashSet<int> ultraIndices = new HashSet<int>(new int[]{80, 81, 82, 83, 84});
 
-        int tileIndex = fgMap.GetCellv(new Vector2(pos.x / tileWidth, pos.y / tileHeight));
+        int tileIndex = GetTileAt(pos);
+        if (tileIndex == -1) {
+            return EarthTileType.Empty;
+        }
         if (easyIndices.Contains(tileIndex)) {
             return EarthTileType.Easy;
         }

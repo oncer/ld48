@@ -9,11 +9,11 @@ region = Rect2( 0, 0, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=2]
 atlas = ExtResource( 1 )
-region = Rect2( 0, 32, 16, 16 )
+region = Rect2( 0, 16, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=3]
 atlas = ExtResource( 1 )
-region = Rect2( 0, 16, 16, 16 )
+region = Rect2( 0, 32, 16, 16 )
 
 [sub_resource type="SpriteFrames" id=4]
 animations = [ {
@@ -24,12 +24,12 @@ animations = [ {
 }, {
 "frames": [ SubResource( 2 ) ],
 "loop": true,
-"name": "enemy3",
+"name": "enemy2",
 "speed": 5.0
 }, {
 "frames": [ SubResource( 3 ) ],
 "loop": true,
-"name": "enemy2",
+"name": "enemy3",
 "speed": 5.0
 } ]
 
@@ -58,5 +58,19 @@ collision_layer = 8
 [node name="CollisionShape2D" type="CollisionShape2D" parent="OverlapDetector"]
 position = Vector2( 0, 2 )
 shape = SubResource( 6 )
+
+[node name="EdgeDetector" type="Node2D" parent="."]
+position = Vector2( 7.01895, 10.1973 )
+
+[node name="Debug" type="Label" parent="."]
+visible = false
+margin_left = -42.719
+margin_top = -15.7486
+margin_right = 42.281
+margin_bottom = -1.74864
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [connection signal="body_entered" from="OverlapDetector" to="." method="OnOverlapDetectorBodyEntered"]

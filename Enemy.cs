@@ -18,6 +18,11 @@ public class Enemy : KinematicBody2D, TMXObject
 
     public ObjectType Type {get; set;}
 
+    private Node2D edgeDetector;
+    private Map map;
+
+    private Label debug;
+
 
     public void Kill()
     {
@@ -47,6 +52,15 @@ public class Enemy : KinematicBody2D, TMXObject
         }
     }
 
+    public void Debug(string text)
+    {
+        if (debug != null) {
+            debug.Visible = true;
+            debug.RectScale = new Vector2(Scale.x, 1);
+            debug.Text = text;
+        }
+    }
+
     public override void _PhysicsProcess(float delta)
     {
         bool isOnFloor = IsOnFloor();
@@ -54,6 +68,14 @@ public class Enemy : KinematicBody2D, TMXObject
         bool isOnWall = IsOnWall();
 
         Velocity.y += Gravity * delta;
+        bool edgeDetected = false;
+        if (Type != ObjectType.Enemy3 && edgeDetector != null) {
+            Vector2 edgePos = Position + edgeDetector.Position * new Vector2(xDir < 0 ? -1 : 1, 1);
+            int edgeTile = map.GetTileAt(edgePos);
+            if (edgeTile == -1) {
+                edgeDetected = true;
+            }
+        }
         if (idleWait > 0 || Type == ObjectType.Spike) {
             Velocity.x = 0;
         } else {
@@ -61,9 +83,10 @@ public class Enemy : KinematicBody2D, TMXObject
             Velocity.x = xDir * Speed;
         }
         Velocity = MoveAndSlide(Velocity);
+        isOnWall = isOnWall && Velocity.x == 0;
 
-        if (isOnWall && Velocity.x == 0 && idleWait <= 0) {
-            //if (Type == ObjectType.Enemy2) GD.Print("enemy change dir");
+
+        if ((isOnWall || edgeDetected) && idleWait <= 0) {
             xDir = -xDir;
             idleWait = 1;
         }
@@ -81,6 +104,9 @@ public class Enemy : KinematicBody2D, TMXObject
         xDir = 1;
         Velocity = Vector2.Zero;
         sprite = GetNode<AnimatedSprite>("Sprite");
+        map = GetNode<Map>("..");
+        edgeDetector = GetNodeOrNull<Node2D>("EdgeDetector");
+        debug = GetNodeOrNull<Label>("Debug");
 
         switch (Type)
         {
