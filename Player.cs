@@ -355,7 +355,13 @@ public class Player : KinematicBody2D
         get => state;
         set
         {
-            animatedSprite.Play(value.GetString());
+            var str = value.GetString();
+            if (value == PlayerState.DigDown || value == PlayerState.DigSide)
+            {
+                if (ShovelPower > 0)
+                    str += ShovelPower;
+            }
+            animatedSprite.Play(str);
             state = value;
         }
     }

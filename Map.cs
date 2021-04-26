@@ -48,7 +48,7 @@ public class Map : Node2D
     public EarthTileType GetEarthTileAt(Vector2 pos)
     {
         HashSet<int> easyIndices = new HashSet<int>(new int[]{32, 33, 34, 35, 36});
-        HashSet<int> mediumIndices = new HashSet<int>(new int[]{48, 49, 50, 51});
+        HashSet<int> mediumIndices = new HashSet<int>(new int[]{48, 49, 50, 51, 52});
         HashSet<int> hardIndices = new HashSet<int>(new int[]{64, 65, 66, 67, 68});
         HashSet<int> ultraIndices = new HashSet<int>(new int[]{80, 81, 82, 83, 84});
 
