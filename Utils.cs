@@ -25,6 +25,8 @@ public static class Utils
                 return "digDown";                    
             case PlayerState.Die:
                 return "die";
+            case PlayerState.Respawn:
+                return "die"; // this is translated to animation, there is no "respawn" animation
             default:
                 throw new NotImplementedException();
         }

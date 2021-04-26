@@ -47,7 +47,16 @@ public class Player : KinematicBody2D
     public void OnAnimationPlayerAnimationFinished(string name)
     {
         if (name == "QuickFadeOut") {
+            // actual respawn happens while screen is black
+            ghostSin = .5f * Math.PI;
+            ghostTime = maxGhostTime;
+            gravity = GravityDefault;
+            speedY = 0;
+            speedX = 0;
+            hasJumped = false;
+            hitHead = false;
             Position = SpawnPosition;
+            State = PlayerState.Idle;
             fadeAnim.Play("QuickFadeIn");
         }
     }
@@ -126,7 +135,7 @@ public class Player : KinematicBody2D
             moveInput = 1;
         }
 
-        if (State != PlayerState.Die) {
+        if (State != PlayerState.Die && State != PlayerState.Respawn) {
             if (State != PlayerState.DigDown && State != PlayerState.DigSide)
             {
 
@@ -246,7 +255,7 @@ public class Player : KinematicBody2D
                     }
                 }
             }
-        } else // dead:
+        } else // dead or respawning
         {
             gravity = 0f;
             ghostSin = (ghostSin + .08f) % (2 * Math.PI);
@@ -254,17 +263,10 @@ public class Player : KinematicBody2D
             speedY = Math.Max(speedY - 2f, -100f);
             
             ghostTime = Math.Max(ghostTime - delta, 0);
-            if (ghostTime == 0 || Position.y <= -64)
+            if ((ghostTime == 0 || Position.y <= -64) && State == PlayerState.Die)
             {
-                ghostSin = .5f * Math.PI;
-                ghostTime = maxGhostTime;
-                State = PlayerState.Idle;
-                gravity = GravityDefault;
-                speedY = 0;
-                speedX = 0;
-                hasJumped = false;
-                hitHead = false;
-
+                // do not actually respawn here, wait until QuickFadeOut is finished
+                State = PlayerState.Respawn;
                 fadeAnim.Play("QuickFadeOut");
 
                 //GD.Print("SpawnPosition 1 " + SpawnPosition);

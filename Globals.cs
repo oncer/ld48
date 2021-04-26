@@ -13,7 +13,7 @@ public static class Globals
     }
     public enum PlayerState
     {
-        Idle, Walk, JumpUp, JumpDown, DigSide, DigDown, Die
+        Idle, Walk, JumpUp, JumpDown, DigSide, DigDown, Die, Respawn
     }
     
     public static Node2D Scene { get; set; }
