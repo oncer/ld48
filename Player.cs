@@ -32,6 +32,9 @@ public class Player : KinematicBody2D
 
     private int score = 0;
 
+    private float initialDigTime = .2f;
+    private float digTimer = 0;
+
     private Game game;
 
     // Called when the node enters the scene tree for the first time.
@@ -79,6 +82,13 @@ public class Player : KinematicBody2D
         if (onGround)
             hasJumped = false;
 
+        int moveInput = 0;
+        if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right")) {
+            moveInput = -1;
+        } else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left")) {
+            moveInput = 1;
+        }
+
         if (State != PlayerState.Die) {
             if (State != PlayerState.DigDown && State != PlayerState.DigSide)
             {
@@ -89,7 +99,7 @@ public class Player : KinematicBody2D
                 }
 
                 // MOVE RIGHT && LEFT
-                if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right"))
+                if (moveInput < 0)
                 {
                     if (!onGround)
                     {
@@ -103,7 +113,7 @@ public class Player : KinematicBody2D
 
                     if (speedX <= 0) Direction = Direction.Left;
                 }
-                else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left"))
+                else if (moveInput > 0)
                 {
                     if (!onGround)
                     {
@@ -131,11 +141,13 @@ public class Player : KinematicBody2D
                 // dig side
                 if (ShovelPower >= 1 && /*onGround &&*/ /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
                 {
-                    if (Dig(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
+                    if (CanDigDirection(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
                     {
                         State = PlayerState.DigSide;
+                        digTimer = initialDigTime;
                     }
                 }
+
 
                 if (Input.IsActionPressed("ui_up"))
                 {
@@ -180,6 +192,21 @@ public class Player : KinematicBody2D
             {
                 speedX = 0;
                 speedY = -gravity * delta;
+
+                if (State == PlayerState.DigSide && digTimer > 0) {
+                    if (moveInput != (int)Direction) {
+                        State = moveInput == 0 ? PlayerState.Idle : PlayerState.Walk;
+                    }
+                    else 
+                    {
+                        digTimer -= delta;
+                        if (digTimer <= 0) {
+                            if (!Dig(Direction == Direction.Left ? Vector2.Left : Vector2.Right)) {
+                                State = moveInput == 0 ? PlayerState.Idle : PlayerState.Walk;
+                            }
+                        }
+                    }
+                }
             }
         } else // dead:
         {
@@ -238,49 +265,68 @@ public class Player : KinematicBody2D
         }
     }
 
-    bool CheckAndClearAt(Vector2 digPoint)
+    bool ClearTileAt(Vector2 digPoint)
+    {
+        if (CanClearTileAt(digPoint)) {
+            map.ClearEarthTileAt(digPoint);
+            Globals.CreateEffect("destroyBlock", digPoint);
+            return true;
+        }
+        return false;
+    }
+
+
+    private bool CanClearTileAt(Vector2 digPoint)
     {
         var tileType = map.GetEarthTileAt(digPoint);
         if (tileType == EarthTileType.Unknown)
             return false;
 
-        if ((int)tileType <= ShovelPower)
-        {
-            map.ClearEarthTileAt(digPoint);
-
-            Globals.CreateEffect("destroyBlock", digPoint);
-
-            return true;
-        }
-
-        return false;
+        return ((int)tileType <= ShovelPower);
     }
 
+    private Vector2 GetDigPoint(Vector2 dir)
+    {
+        Node2D collision = GetNode<Node2D>("Collision");
+        Vector2 digPoint = collision.GlobalPosition;
+
+        if (dir == Vector2.Left) {
+            return collision.GlobalPosition + new Vector2(-8, 0);            
+        } else if (dir == Vector2.Right) {
+            return collision.GlobalPosition + new Vector2(8, 0);            
+        } else if (dir == Vector2.Down) {
+            for(int i = -2; i <= 2; i+= 2)
+            {
+                digPoint = collision.GlobalPosition + new Vector2(i, 10);
+                if (CanClearTileAt(digPoint)) {
+                    return digPoint;
+                }
+            }
+            return collision.GlobalPosition + new Vector2(0, 10); // fallback
+        }
+        GD.Print($"GetDigPoint: invalid direction ({dir.x},{dir.y})!");
+        return Vector2.Zero;
+    }
+
+    private bool CanDigDirection(Vector2 dir)
+    {
+        return CanClearTileAt(GetDigPoint(dir));
+    }
     //
     //  dir is a unit vector, either Vector2.Left, Vector2.Right, Vector2.Down
     //
     private bool Dig(Vector2 dir)
     {
-        Node2D collision = GetNode<Node2D>("Collision");
-        Vector2 digPoint = collision.GlobalPosition;
-        
-        if (dir == Vector2.Left) {
-            return CheckAndClearAt(collision.GlobalPosition + new Vector2(-8, 0));            
-        } else if (dir == Vector2.Right) {
-            return CheckAndClearAt(collision.GlobalPosition + new Vector2(8, 0));            
-        } else if (dir == Vector2.Down) {
-            if (firstDig) {
+        Vector2 digPoint = GetDigPoint(dir);
+        if (CanClearTileAt(digPoint)) {
+            ClearTileAt(digPoint);
+            if (dir == Vector2.Down && firstDig)
+            {
                 firstDig = false;
                 game.HideTutorialText();
             }
-            for(int i = -2; i <= 2; i+= 2)
-            {
-                digPoint = collision.GlobalPosition + new Vector2(i, 10);
-                var s = CheckAndClearAt(digPoint);
-                if (s == true)
-                    return s;
-            }            
-        }        
+            return true;
+        }
         return false;
     }
 
