@@ -35,6 +35,9 @@ public class Player : KinematicBody2D
     private float initialDigTime = .2f;
     private float digTimer = 0;
 
+    private float dieTutorialTimer = 0;
+    private bool suicideHappened = false;
+
     private Game game;
 
     // Called when the node enters the scene tree for the first time.
@@ -65,6 +68,18 @@ public class Player : KinematicBody2D
         speedX = 0;
         speedY = 0;
         State = PlayerState.Die;
+    }
+
+    public override void _Process(float delta)
+    {
+        if (dieTutorialTimer > 0 && !suicideHappened) {
+            dieTutorialTimer -= delta;
+            if (dieTutorialTimer <= 0) {
+                game.ShowTutorialText("When you are stuck: press TAB!");
+                game.HideTutorialText(3.5f);
+                dieTutorialTimer = 34;
+            }
+        }
     }
 
     public override void _PhysicsProcess(float delta)
@@ -179,6 +194,7 @@ public class Player : KinematicBody2D
                 if (Input.IsActionPressed("ui_focus_next"))
                 {
                     Kill();
+                    suicideHappened = true;
                 }
 
                 animatedSprite.FlipH = (Direction == Direction.Left);
@@ -324,6 +340,7 @@ public class Player : KinematicBody2D
             {
                 firstDig = false;
                 game.HideTutorialText();
+                dieTutorialTimer = 20;
             }
             return true;
         }

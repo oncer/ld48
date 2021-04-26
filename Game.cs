@@ -10,12 +10,12 @@ public class Game : Node2D
 
 	private Player player;
 
-	private Label tutorialText;
+	private TutorialText tutorialText;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		tutorialText = GetNode<Label>("CanvasLayer/TutorialText");
+		tutorialText = GetNode<TutorialText>("CanvasLayer/TutorialText");
 		player = GetNode<Player>("Map/Player");
 		player.State = PlayerState.Idle;
 
@@ -24,18 +24,11 @@ public class Game : Node2D
 
 	public void ShowTutorialText(string text)
 	{
-		tutorialText.Text = text;
-		tutorialText.Visible = true;
+		tutorialText.Show(text);
 	}
 
-	public void HideTutorialText()
+	public void HideTutorialText(float waitTime=0)
 	{
-		tutorialText.Visible = false;
+		tutorialText.Disappear(waitTime);
 	}
-
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
 }
