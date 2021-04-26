@@ -38,9 +38,9 @@ public class Enemy : KinematicBody2D, TMXObject
             }
         } else if (body is Enemy) {
             Enemy enemy = body as Enemy;
-            GD.Print(enemy.Type.ToString() + " entered " + Type.ToString());
             if (Type == ObjectType.Spike) {
                 if (!enemy.IsOnFloor() && enemy.Velocity.y > 0) {
+                    GD.Print(enemy.Type.ToString() + " killed by " + Type.ToString());
                     enemy.Kill();
                 }
             }
