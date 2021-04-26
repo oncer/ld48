@@ -14,8 +14,9 @@ public static class Globals
     {
         Idle, Walk, JumpUp, JumpDown, DigSide, DigDown, Die
     }
-    public enum EffectState
+    public enum EffectType
     {
+        None,
         Poof
     }
 }

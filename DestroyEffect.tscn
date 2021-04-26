@@ -28,9 +28,9 @@ animations = [ {
 } ]
 
 [node name="DestroyEffect" type="Node2D"]
+z_index = 100
 script = ExtResource( 2 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
-position = Vector2( 3, 0 )
 frames = SubResource( 5 )
 animation = "poof"

@@ -30,11 +30,11 @@ public static class Utils
         }
     }
 
-    public static string GetString(this EffectState a)
+    public static string GetString(this EffectType a)
     {
         switch (a)
         {
-            case EffectState.Poof:
+            case EffectType.Poof:
                 return "poof";  
             default:
                 throw new NotImplementedException();

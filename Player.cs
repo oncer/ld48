@@ -7,6 +7,7 @@ public class Player : KinematicBody2D
     public int ShovelPower { get; set; } = 1;
     public Direction Direction { get; private set; }
 
+    private PackedScene destroyEffect;
     private AnimatedSprite animatedSprite;
     private Map map;    
     private float speedX, speedY;
@@ -22,7 +23,7 @@ public class Player : KinematicBody2D
     private RayCast2D platformDetector;
     private const float maxGhostTime = 3f; // seconds
     private float ghostTime = maxGhostTime;
-    private double ghostSin = Math.PI;
+    private double ghostSin = .5f * Math.PI;
     private Label debugText;
     private Vector2 originalPosition;
     private bool hasJumped = false;
@@ -33,6 +34,7 @@ public class Player : KinematicBody2D
     {
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
         platformDetector = GetNode<RayCast2D>("PlatformDetector");
+        destroyEffect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
         camera = GetNode<Camera2D>("Camera");
         camera.CustomViewport = GetNode("../..");
         map = GetNode<Map>("..");
@@ -149,13 +151,6 @@ public class Player : KinematicBody2D
                     State = PlayerState.Die;
                 }
 
-
-                if(Input.IsActionPressed("ui_select")) {
-                    var effect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
-                    var node = effect.Instance<Node>();
-                    AddChild(node);            
-                }
-
                 animatedSprite.FlipH = (Direction == Direction.Left);
 
                 if (State == PlayerState.JumpUp)
@@ -171,14 +166,14 @@ public class Player : KinematicBody2D
         } else // dead:
         {
             gravity = 0f;
-            ghostSin = (ghostSin + .1f) % (2 * Math.PI);
-            speedX = (float)Math.Sin(ghostSin) * 60;
-            speedY = Math.Max(speedY - 3f, -100f);
+            ghostSin = (ghostSin + .08f) % (2 * Math.PI);
+            speedX = (float)Math.Sin(ghostSin) * 40;
+            speedY = Math.Max(speedY - 2f, -100f);
             
             ghostTime = Math.Max(ghostTime - delta, 0);
-            if (ghostTime == 0 || Position.y <= 0)
+            if (ghostTime == 0 || Position.y <= -64)
             {
-                ghostSin = Math.PI;
+                ghostSin = .5f * Math.PI;
                 ghostTime = maxGhostTime;
                 State = PlayerState.Idle;
                 gravity = GravityDefault;
@@ -205,6 +200,10 @@ public class Player : KinematicBody2D
 
         Position = new Vector2(Mathf.Clamp(Position.x, 8, 640 - 8), Position.y);
 
+        // disable collision if dead
+        var collision = GetNode<CollisionShape2D>("Collision");
+        collision.Disabled = State == PlayerState.Die;
+
         velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
 
         if (isOnWall) speedX = 0;
@@ -230,6 +229,11 @@ public class Player : KinematicBody2D
         if ((int)tileType <= ShovelPower)
         {
             map.ClearEarthTileAt(digPoint);
+            
+            var eff = destroyEffect.Instance<DestroyEffect>();
+            eff.Position = Position;
+            eff.StartAt(Position, EffectType.Poof);
+            AddChild(eff);
             return true;
         }
 
