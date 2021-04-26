@@ -129,7 +129,7 @@ public class Player : KinematicBody2D
                 }
 
                 // dig side
-                if (ShovelPower >= 1 && onGround && /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
+                if (ShovelPower >= 1 && /*onGround &&*/ /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
                 {
                     if (Dig(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
                     {
