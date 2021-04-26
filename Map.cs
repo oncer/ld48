@@ -13,6 +13,7 @@ public class Map : Node2D
     public Resource tmx;
     int tileWidth;
     int tileHeight;
+    Vector2 tileSize;
     int width;
     int height;
 
@@ -78,6 +79,7 @@ public class Map : Node2D
             XmlElement root = xmlDoc.DocumentElement;
             tileWidth = int.Parse(root.Attributes["tilewidth"].Value);
             tileHeight = int.Parse(root.Attributes["tileheight"].Value);
+            tileSize = new Vector2(tileWidth, tileHeight);
             width = int.Parse(root.Attributes["width"].Value);
             height = int.Parse(root.Attributes["height"].Value);
             XmlNode tilesetNode = root.SelectSingleNode("tileset");
@@ -154,9 +156,8 @@ public class Map : Node2D
         }
     }
 
-    public void SpawnObjects(TileMap layer, ObjectType type, PackedScene objectScene)
+    public void SpawnItemObjects(TileMap layer, ObjectType type, PackedScene objectScene)
     {
-        Vector2 tileSize = new Vector2(tileWidth, tileHeight);
         Godot.Collections.Array cells = layer.GetUsedCellsById((int)type);
         foreach (object cell in cells) {
             Vector2 pos = (Vector2) cell;
@@ -168,15 +169,28 @@ public class Map : Node2D
         }
     }
 
+    public void SpawnPlayer(TileMap layer, ObjectType type)
+    {
+        Godot.Collections.Array cells = layer.GetUsedCellsById((int)type);
+        Player ply = GetNode<Player>("Player");
+        foreach (object cell in cells) {
+            GD.Print("player cell found!");
+            layer.SetCellv((Vector2) cell, -1);
+            ply.Position = (Vector2) cell * tileSize + tileSize * 0.5f;
+            break;
+        }
+    }
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         shovelItemScene = GD.Load<PackedScene>("res://ShovelItem.tscn");
 
         LoadTMX("map.tmx");
-        SpawnObjects(layers["FG"], ObjectType.Shovel1, shovelItemScene);
-        SpawnObjects(layers["FG"], ObjectType.Shovel2, shovelItemScene);
-        SpawnObjects(layers["FG"], ObjectType.Shovel3, shovelItemScene);
+        SpawnItemObjects(layers["FG"], ObjectType.Shovel1, shovelItemScene);
+        SpawnItemObjects(layers["FG"], ObjectType.Shovel2, shovelItemScene);
+        SpawnItemObjects(layers["FG"], ObjectType.Shovel3, shovelItemScene);
+        SpawnPlayer(layers["FG"], ObjectType.Player);
     }
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
