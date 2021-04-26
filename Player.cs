@@ -4,7 +4,7 @@ using static Globals;
 
 public class Player : KinematicBody2D
 {
-    public int ShovelPower { get; set; } = 1;
+    public int ShovelPower { get; set; } = 0;
     public Direction Direction { get; private set; }
 
     private PackedScene destroyEffect;
@@ -29,9 +29,14 @@ public class Player : KinematicBody2D
     private bool hasJumped = false;
     private bool hitHead = false;
 
+    private bool firstDig = true;
+
+    private Game game;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        game = GetNode<Game>("/root/Game");
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
         platformDetector = GetNode<RayCast2D>("PlatformDetector");
         destroyEffect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
@@ -109,7 +114,7 @@ public class Player : KinematicBody2D
                 }
 
                 // dig side
-                if (onGround && /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
+                if (ShovelPower >= 1 && onGround && /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
                 {
                     if (Dig(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
                     {
@@ -133,7 +138,7 @@ public class Player : KinematicBody2D
                     gravity = GravityDefault;
                 }
 
-                if (Input.IsActionPressed("ui_down") && isOnFloor && State != PlayerState.DigSide)
+                if (ShovelPower >= 1 && Input.IsActionPressed("ui_down") && isOnFloor && State != PlayerState.DigSide)
                 {
                     var hasDigged = Dig(Vector2.Down);
 
@@ -253,6 +258,10 @@ public class Player : KinematicBody2D
         } else if (dir == Vector2.Right) {
             return CheckAndClearAt(collision.GlobalPosition + new Vector2(8, 0));            
         } else if (dir == Vector2.Down) {
+            if (firstDig) {
+                firstDig = false;
+                game.HideTutorialText();
+            }
             for(int i = -2; i <= 2; i+= 2)
             {
                 digPoint = collision.GlobalPosition + new Vector2(i, 10);

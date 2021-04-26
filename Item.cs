@@ -12,10 +12,13 @@ public class Item : Area2D
     private Sprite sprite;
     private float time;
 
+    private Game game;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         sprite = GetNode<Sprite>("Sprite");
+        game = GetNode<Game>("/root/Game");
     }
 
     public override void _Process(float delta)
@@ -32,6 +35,7 @@ public class Item : Area2D
         switch (Type) {
         case ObjectType.Shovel1:
             player.ShovelPower = 1;
+            game.ShowTutorialText("Dig down!");
             GD.Print("Acquired shovel 1!");
             QueueFree();
             break;
