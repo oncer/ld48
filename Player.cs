@@ -31,7 +31,7 @@ public class Player : KinematicBody2D
 
     private bool firstDig = true;
 
-    private int score = 0;
+    public int Score = 0;
 
     private float initialDigTime = .2f;
     private float digTimer = 0;
@@ -61,7 +61,8 @@ public class Player : KinematicBody2D
     public void AcquireCoin(int value)
     {
         GD.Print("Acquired coin with value " + value);
-        score += value;
+        Score += value;
+        game.UpdateScoreText();
     }
 
     public void Kill()
