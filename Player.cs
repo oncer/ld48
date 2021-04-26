@@ -29,12 +29,16 @@ public class Player : KinematicBody2D
     private bool hasJumped = false;
     private bool hitHead = false;
 
+    Node2D scene;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        scene = GetNode<Node2D>("..");
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
         platformDetector = GetNode<RayCast2D>("PlatformDetector");
         destroyEffect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
+        
         camera = GetNode<Camera2D>("Camera");
         camera.CustomViewport = GetNode("../..");
         map = GetNode<Map>("..");
@@ -229,11 +233,16 @@ public class Player : KinematicBody2D
         if ((int)tileType <= ShovelPower)
         {
             map.ClearEarthTileAt(digPoint);
-            
+
             var eff = destroyEffect.Instance<DestroyEffect>();
-            eff.Position = Position;
-            eff.StartAt(Position, EffectType.Poof);
-            AddChild(eff);
+            eff.EffectType = EffectType.Poof;
+
+            var x = ((int)digPoint.x / 16) * 16 + 8;
+            var y = ((int)digPoint.y / 16) * 16 + 8;
+
+            eff.Position = new Vector2(x, y);
+            scene.AddChild(eff);
+
             return true;
         }
 
