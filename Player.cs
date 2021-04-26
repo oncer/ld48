@@ -14,7 +14,7 @@ public class Player : KinematicBody2D
     private float dragX = .7f;
     private const float accX = 20f;
     private Camera2D camera;
-    private Vector2 velocity = new Vector2(0.0f, 0.0f);
+    public Vector2 Velocity = Vector2.Zero;
     private const float GravityDefault = 700.0f;
     private const float GravityJump = 400.0f;
     private float gravity = GravityDefault;
@@ -31,6 +31,12 @@ public class Player : KinematicBody2D
     private bool firstDig = true;
 
     private int score = 0;
+
+    private float initialDigTime = .2f;
+    private float digTimer = 0;
+
+    private float dieTutorialTimer = 0;
+    private bool suicideHappened = false;
 
     private Game game;
 
@@ -64,6 +70,18 @@ public class Player : KinematicBody2D
         State = PlayerState.Die;
     }
 
+    public override void _Process(float delta)
+    {
+        if (dieTutorialTimer > 0 && !suicideHappened) {
+            dieTutorialTimer -= delta;
+            if (dieTutorialTimer <= 0) {
+                game.ShowTutorialText("When you are stuck: press TAB!");
+                game.HideTutorialText(3.5f);
+                dieTutorialTimer = 34;
+            }
+        }
+    }
+
     public override void _PhysicsProcess(float delta)
     {
         bool isOnPlatform = platformDetector.IsColliding();
@@ -79,6 +97,13 @@ public class Player : KinematicBody2D
         if (onGround)
             hasJumped = false;
 
+        int moveInput = 0;
+        if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right")) {
+            moveInput = -1;
+        } else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left")) {
+            moveInput = 1;
+        }
+
         if (State != PlayerState.Die) {
             if (State != PlayerState.DigDown && State != PlayerState.DigSide)
             {
@@ -89,7 +114,7 @@ public class Player : KinematicBody2D
                 }
 
                 // MOVE RIGHT && LEFT
-                if (Input.IsActionPressed("ui_left") && !Input.IsActionPressed("ui_right"))
+                if (moveInput < 0)
                 {
                     if (!onGround)
                     {
@@ -103,7 +128,7 @@ public class Player : KinematicBody2D
 
                     if (speedX <= 0) Direction = Direction.Left;
                 }
-                else if (Input.IsActionPressed("ui_right") && !Input.IsActionPressed("ui_left"))
+                else if (moveInput > 0)
                 {
                     if (!onGround)
                     {
@@ -129,13 +154,15 @@ public class Player : KinematicBody2D
                 }
 
                 // dig side
-                if (ShovelPower >= 1 && onGround && /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
+                if (ShovelPower >= 1 && /*onGround &&*/ /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
                 {
-                    if (Dig(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
+                    if (CanDigDirection(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
                     {
                         State = PlayerState.DigSide;
+                        digTimer = initialDigTime;
                     }
                 }
+
 
                 if (Input.IsActionPressed("ui_up"))
                 {
@@ -167,6 +194,7 @@ public class Player : KinematicBody2D
                 if (Input.IsActionPressed("ui_focus_next"))
                 {
                     Kill();
+                    suicideHappened = true;
                 }
 
                 animatedSprite.FlipH = (Direction == Direction.Left);
@@ -180,6 +208,21 @@ public class Player : KinematicBody2D
             {
                 speedX = 0;
                 speedY = -gravity * delta;
+
+                if (State == PlayerState.DigSide && digTimer > 0) {
+                    if (moveInput != (int)Direction) {
+                        State = moveInput == 0 ? PlayerState.Idle : PlayerState.Walk;
+                    }
+                    else 
+                    {
+                        digTimer -= delta;
+                        if (digTimer <= 0) {
+                            if (!Dig(Direction == Direction.Left ? Vector2.Left : Vector2.Right)) {
+                                State = moveInput == 0 ? PlayerState.Idle : PlayerState.Walk;
+                            }
+                        }
+                    }
+                }
             }
         } else // dead:
         {
@@ -206,9 +249,9 @@ public class Player : KinematicBody2D
 
         animatedSprite.FlipH = (Direction == Direction.Left);
 
-        velocity.x = speedX;
+        Velocity.x = speedX;
         speedY += gravity * delta;
-        velocity.y = speedY;
+        Velocity.y = speedY;
 
         Vector2 direction = new Vector2(0.0f, 0.0f); // TODO input goes here
         Vector2 snapVector = Vector2.Zero;
@@ -222,7 +265,7 @@ public class Player : KinematicBody2D
         var collision = GetNode<CollisionShape2D>("Collision");
         collision.Disabled = State == PlayerState.Die;
 
-        velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
+        Velocity = MoveAndSlide(Velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
 
         if (isOnWall) speedX = 0;
         if (isOnCeil) speedY = Math.Max(speedY, 0);
@@ -238,49 +281,69 @@ public class Player : KinematicBody2D
         }
     }
 
-    bool CheckAndClearAt(Vector2 digPoint)
+    bool ClearTileAt(Vector2 digPoint)
+    {
+        if (CanClearTileAt(digPoint)) {
+            map.ClearEarthTileAt(digPoint);
+            Globals.CreateEffect("destroyBlock", digPoint);
+            return true;
+        }
+        return false;
+    }
+
+
+    private bool CanClearTileAt(Vector2 digPoint)
     {
         var tileType = map.GetEarthTileAt(digPoint);
         if (tileType == EarthTileType.Unknown)
             return false;
 
-        if ((int)tileType <= ShovelPower)
-        {
-            map.ClearEarthTileAt(digPoint);
-
-            Globals.CreateEffect("destroyBlock", digPoint);
-
-            return true;
-        }
-
-        return false;
+        return ((int)tileType <= ShovelPower);
     }
 
+    private Vector2 GetDigPoint(Vector2 dir)
+    {
+        Node2D collision = GetNode<Node2D>("Collision");
+        Vector2 digPoint = collision.GlobalPosition;
+
+        if (dir == Vector2.Left) {
+            return collision.GlobalPosition + new Vector2(-8, 0);            
+        } else if (dir == Vector2.Right) {
+            return collision.GlobalPosition + new Vector2(8, 0);            
+        } else if (dir == Vector2.Down) {
+            for(int i = -2; i <= 2; i+= 2)
+            {
+                digPoint = collision.GlobalPosition + new Vector2(i, 10);
+                if (CanClearTileAt(digPoint)) {
+                    return digPoint;
+                }
+            }
+            return collision.GlobalPosition + new Vector2(0, 10); // fallback
+        }
+        GD.Print($"GetDigPoint: invalid direction ({dir.x},{dir.y})!");
+        return Vector2.Zero;
+    }
+
+    private bool CanDigDirection(Vector2 dir)
+    {
+        return CanClearTileAt(GetDigPoint(dir));
+    }
     //
     //  dir is a unit vector, either Vector2.Left, Vector2.Right, Vector2.Down
     //
     private bool Dig(Vector2 dir)
     {
-        Node2D collision = GetNode<Node2D>("Collision");
-        Vector2 digPoint = collision.GlobalPosition;
-        
-        if (dir == Vector2.Left) {
-            return CheckAndClearAt(collision.GlobalPosition + new Vector2(-8, 0));            
-        } else if (dir == Vector2.Right) {
-            return CheckAndClearAt(collision.GlobalPosition + new Vector2(8, 0));            
-        } else if (dir == Vector2.Down) {
-            if (firstDig) {
+        Vector2 digPoint = GetDigPoint(dir);
+        if (CanClearTileAt(digPoint)) {
+            ClearTileAt(digPoint);
+            if (dir == Vector2.Down && firstDig)
+            {
                 firstDig = false;
                 game.HideTutorialText();
+                dieTutorialTimer = 20;
             }
-            for(int i = -2; i <= 2; i+= 2)
-            {
-                digPoint = collision.GlobalPosition + new Vector2(i, 10);
-                var s = CheckAndClearAt(digPoint);
-                if (s == true)
-                    return s;
-            }            
-        }        
+            return true;
+        }
         return false;
     }
 

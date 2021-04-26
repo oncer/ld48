@@ -8,7 +8,7 @@ public class Enemy : KinematicBody2D, TMXObject
     // private string b = "text";
 
     private float xDir = 0;
-    private Vector2 velocity;
+    public Vector2 Velocity;
     private const float Gravity = 400;
     private float Speed = 50;
 
@@ -18,11 +18,33 @@ public class Enemy : KinematicBody2D, TMXObject
 
     public ObjectType Type {get; set;}
 
+
+    public void Kill()
+    {
+        Globals.CreateEffect("destroyEnemy", Position);
+        QueueFree();
+    }
+
     void OnOverlapDetectorBodyEntered(Node body)
     {
-        Player player = body as Player;
-        if (player == null) return;
-        player.Kill();
+        if (body is Player) {
+            Player player = body as Player;        
+            if (Type == ObjectType.Spike) {
+                if (!player.IsOnFloor() && player.Velocity.y > 0) {
+                    player.Kill();
+                }
+            } else {
+                player.Kill();
+            }
+        } else if (body is Enemy) {
+            Enemy enemy = body as Enemy;
+            GD.Print(enemy.Type.ToString() + " entered " + Type.ToString());
+            if (Type == ObjectType.Spike) {
+                if (!enemy.IsOnFloor() && enemy.Velocity.y > 0) {
+                    enemy.Kill();
+                }
+            }
+        }
     }
 
     public override void _PhysicsProcess(float delta)
@@ -31,21 +53,21 @@ public class Enemy : KinematicBody2D, TMXObject
         bool isOnCeil = IsOnCeiling();
         bool isOnWall = IsOnWall();
 
-        velocity.y += Gravity * delta;
-        if (idleWait > 0) {
-            velocity.x = 0;
+        Velocity.y += Gravity * delta;
+        if (idleWait > 0 || Type == ObjectType.Spike) {
+            Velocity.x = 0;
         } else {
             sprite.FlipH = xDir < 0;
-            velocity.x = xDir * Speed;
+            Velocity.x = xDir * Speed;
         }
-        velocity = MoveAndSlide(velocity);
+        Velocity = MoveAndSlide(Velocity);
 
-        if (isOnWall && velocity.x == 0 && idleWait <= 0) {
+        if (isOnWall && Velocity.x == 0 && idleWait <= 0) {
             //if (Type == ObjectType.Enemy2) GD.Print("enemy change dir");
             xDir = -xDir;
             idleWait = 1;
         }
-        if (isOnFloor) velocity.y = 0;
+        if (isOnFloor) Velocity.y = 0;
     }
 
     public override void _Process(float delta)
@@ -57,7 +79,7 @@ public class Enemy : KinematicBody2D, TMXObject
     public override void _Ready()
     {
         xDir = 1;
-        velocity = Vector2.Zero;
+        Velocity = Vector2.Zero;
         sprite = GetNode<AnimatedSprite>("Sprite");
 
         switch (Type)
@@ -70,6 +92,12 @@ public class Enemy : KinematicBody2D, TMXObject
             break;
         case ObjectType.Enemy3:
             sprite.Play("enemy3");
+            break;
+        case ObjectType.Spike:
+            sprite.Play("spike");
+            break;
+        case ObjectType.Trap:
+            sprite.Play("trap");
             break;
         }
     }

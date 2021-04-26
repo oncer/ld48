@@ -4,6 +4,8 @@ public enum ObjectType
     Enemy1 = 2,
     Enemy2 = 3,
     Enemy3 = 4,
+    Spike = 5,
+    Trap = 6,
 
     Coin1 = 16,
     Coin2 = 17,

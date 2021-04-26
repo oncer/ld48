@@ -20,6 +20,7 @@ public class Map : Node2D
     private PackedScene shovelItemScene;
     private PackedScene coinItemScene;
     private PackedScene enemyScene;
+    private PackedScene spikeScene;
 
     static string ResolvePath(string path)
     {
@@ -189,6 +190,7 @@ public class Map : Node2D
         shovelItemScene = GD.Load<PackedScene>("res://ShovelItem.tscn");
         coinItemScene = GD.Load<PackedScene>("res://CoinItem.tscn");
         enemyScene = GD.Load<PackedScene>("res://Enemy.tscn");
+        spikeScene = GD.Load<PackedScene>("res://Spike.tscn");
 
         LoadTMX("map.tmx");
         SpawnObjects(layers["FG"], ObjectType.Shovel1, shovelItemScene);
@@ -203,8 +205,9 @@ public class Map : Node2D
         SpawnObjects(layers["FG"], ObjectType.Enemy1, enemyScene);
         SpawnObjects(layers["FG"], ObjectType.Enemy2, enemyScene);
         SpawnObjects(layers["FG"], ObjectType.Enemy3, enemyScene);
+        SpawnObjects(layers["FG"], ObjectType.Spike, spikeScene);
 
-        
+
         SpawnPlayer(layers["FG"], ObjectType.Player);
     }
 
