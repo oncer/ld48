@@ -22,17 +22,13 @@ game engine:
 
 next steps: 
 
-* read player position from 1st tile in tileset & make tile invisible
-* shovel 3d animation (peter)
 ***** level design (get to end) (Amelie)
-***** default no shovel (Simon)
 ***** GOAL (Simon code, Peter GFX)
 *** intro (Simon code, Peter GFX)
 * outro
 *** 3 enemy types (können wir höhlenkinder machen?)
 * Credits <- geht in spielebeschreibung
 ** sound
-*** Stacheln (Simon code, Peter GFX)
 
 *** test level design & redesign
 *** enemy logic, object logic
