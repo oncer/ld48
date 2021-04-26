@@ -7,7 +7,6 @@ public class Player : KinematicBody2D
     public int ShovelPower { get; set; } = 0;
     public Direction Direction { get; private set; }
 
-    private PackedScene destroyEffect;
     private AnimatedSprite animatedSprite;
     private Map map;    
     private float speedX, speedY;
@@ -37,9 +36,10 @@ public class Player : KinematicBody2D
     public override void _Ready()
     {
         game = GetNode<Game>("/root/Game");
+        Globals.Scene = GetNode<Node2D>("..");
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
         platformDetector = GetNode<RayCast2D>("PlatformDetector");
-        destroyEffect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
+        
         camera = GetNode<Camera2D>("Camera");
         camera.CustomViewport = GetNode("../..");
         map = GetNode<Map>("..");
@@ -234,11 +234,9 @@ public class Player : KinematicBody2D
         if ((int)tileType <= ShovelPower)
         {
             map.ClearEarthTileAt(digPoint);
-            
-            var eff = destroyEffect.Instance<DestroyEffect>();
-            eff.Position = Position;
-            eff.StartAt(Position, EffectType.Poof);
-            AddChild(eff);
+
+            Globals.CreateEffect("destroyBlock", digPoint);
+
             return true;
         }
 
