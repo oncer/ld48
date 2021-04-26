@@ -53,16 +53,19 @@ public class Item : Area2D
         case ObjectType.Shovel1:
             player.ShovelPower = 1;
             game.ShowTutorialText("Dig down!");
+            Globals.CreateEffect("takeItem", Position);
             GD.Print("Acquired shovel 1!");
             QueueFree();
             break;
         case ObjectType.Shovel2:
             player.ShovelPower = 2;
+            Globals.CreateEffect("takeItem", Position);
             GD.Print("Acquired shovel 2!");
             QueueFree();
             break;
         case ObjectType.Shovel3:
             player.ShovelPower = 3;
+            Globals.CreateEffect("takeItem", Position);
             GD.Print("Acquired shovel 3!");
             QueueFree();
             break;

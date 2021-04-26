@@ -1,0 +1,77 @@
+[gd_scene load_steps=17 format=2]
+
+[ext_resource path="res://gfx/effects.png" type="Texture" id=1]
+[ext_resource path="res://Effect.cs" type="Script" id=2]
+
+[sub_resource type="AtlasTexture" id=15]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=16]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=17]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=18]
+atlas = ExtResource( 1 )
+region = Rect2( 96, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=19]
+atlas = ExtResource( 1 )
+region = Rect2( 128, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 32, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 32, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 32, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=9]
+atlas = ExtResource( 1 )
+region = Rect2( 96, 32, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 1 )
+region = Rect2( 128, 32, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=11]
+atlas = ExtResource( 1 )
+region = Rect2( 160, 32, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=12]
+atlas = ExtResource( 1 )
+region = Rect2( 192, 32, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=13]
+atlas = ExtResource( 1 )
+region = Rect2( 224, 32, 32, 32 )
+
+[sub_resource type="SpriteFrames" id=14]
+animations = [ {
+"frames": [ SubResource( 15 ), SubResource( 16 ), SubResource( 17 ), SubResource( 18 ), SubResource( 19 ) ],
+"loop": false,
+"name": "takeItem",
+"speed": 15.0
+}, {
+"frames": [ SubResource( 6 ), SubResource( 7 ), SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ) ],
+"loop": true,
+"name": "destroyBlock",
+"speed": 15.0
+} ]
+
+[node name="Effect" type="Node2D"]
+z_index = 100
+script = ExtResource( 2 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+frames = SubResource( 14 )
+animation = "takeItem"

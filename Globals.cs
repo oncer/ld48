@@ -20,8 +20,8 @@ public static class Globals
 
     internal static void CreateEffect(string name, Vector2 position)
     {
-        var destroyEffect = GD.Load<PackedScene>("res://DestroyEffect.tscn");
-        var effect = destroyEffect.Instance<DestroyEffect>();
+        var destroyEffect = GD.Load<PackedScene>("res://Effect.tscn");
+        var effect = destroyEffect.Instance<Effect>();
         effect.EffectName = name;
 
         var x = ((int)position.x / 16) * 16 + 8;
