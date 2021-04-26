@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/malwwwuff.ogg-ebed97b493133904c9b5f1d44d8431b3.oggstr"
+
+[deps]
+
+source_file="res://audio/malwwwuff.ogg"
+dest_files=[ "res://.import/malwwwuff.ogg-ebed97b493133904c9b5f1d44d8431b3.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

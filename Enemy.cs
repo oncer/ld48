@@ -91,6 +91,8 @@ public class Enemy : KinematicBody2D, TMXObject
             idleWait = 1;
         }
         if (isOnFloor) Velocity.y = 0;
+
+        Position = new Vector2(Mathf.Clamp(Position.x, 8, 640 - 8), Position.y);
     }
 
     public override void _Process(float delta)

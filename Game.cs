@@ -21,6 +21,9 @@ public class Game : Node2D
 		scoreText = GetNode<Label>("CanvasLayer/ScoreHUD/ScoreText");
 		player.State = PlayerState.Idle;
 
+		//var music = GetNode<AudioStreamPlayer>("Music");
+		//music.Play();
+
 		ShowTutorialText("Find the shovel!");
 	}
 
