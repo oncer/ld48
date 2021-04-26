@@ -93,7 +93,7 @@ public class Item : Area2D, TMXObject
             break;
         case ObjectType.Shovel1:
             player.ShovelPower = 1;
-            game.ShowTutorialText("Dig down!");
+            game.ShowTutorialText("Awesome! Now start digging!");
             GD.Print("Acquired shovel 1!");
             break;
         case ObjectType.Shovel2:
