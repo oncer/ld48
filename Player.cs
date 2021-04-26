@@ -30,6 +30,8 @@ public class Player : KinematicBody2D
 
     private bool firstDig = true;
 
+    private int score = 0;
+
     private Game game;
 
     // Called when the node enters the scene tree for the first time.
@@ -47,6 +49,19 @@ public class Player : KinematicBody2D
 
         animatedSprite.Connect("animation_finished", this, "OnFinished");
         originalPosition = Position;
+    }
+
+    public void AcquireCoin(int value)
+    {
+        GD.Print("Acquired coin with value " + value);
+        score += value;
+    }
+
+    public void Kill()
+    {
+        speedX = 0;
+        speedY = 0;
+        State = PlayerState.Die;
     }
 
     public override void _PhysicsProcess(float delta)
@@ -151,9 +166,7 @@ public class Player : KinematicBody2D
 
                 if (Input.IsActionPressed("ui_focus_next"))
                 {
-                    speedX = 0;
-                    speedY = 0;
-                    State = PlayerState.Die;
+                    Kill();
                 }
 
                 animatedSprite.FlipH = (Direction == Direction.Left);
