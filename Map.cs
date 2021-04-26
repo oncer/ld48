@@ -149,9 +149,11 @@ public class Map : Node2D
                 for (int y = 0; y < height; y++) {
                     for (int x = 0; x < width; x++) {
                         string dataStrCell = dataStrCells[y * width + x];
-                        int tileId = int.Parse(dataStrCell) - firstgid;
+                        long tileId = long.Parse(dataStrCell);
+                        tileId &= 0xffff;
+                        tileId -= firstgid;
                         if (tileId >= 0) {
-                            map.SetCell(x, y, tileId, false, false, false);
+                            map.SetCell(x, y, (int)tileId, false, false, false);
                             tileCount++;
                         }
                     }
