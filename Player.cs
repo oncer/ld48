@@ -11,6 +11,7 @@ public class Player : KinematicBody2D
     private Map map;    
     private float speedX, speedY;
     private float maxSpeedX = 100;
+    private float maxSpeedY = 250;
     private float dragX = .7f;
     private const float accX = 20f;
     private Camera2D camera;
@@ -265,12 +266,12 @@ public class Player : KinematicBody2D
         var collision = GetNode<CollisionShape2D>("Collision");
         collision.Disabled = State == PlayerState.Die;
 
+        Velocity.y = Mathf.Clamp(Velocity.y, -maxSpeedY, maxSpeedY);
         Velocity = MoveAndSlide(Velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
 
         if (isOnWall) speedX = 0;
         if (isOnCeil) speedY = Math.Max(speedY, 0);
         if (isOnFloor && !hasJumped) speedY = 0;
-
     }
 
     public void OnFinished()
