@@ -18,6 +18,7 @@ public class Map : Node2D
     int height;
 
     private PackedScene shovelItemScene;
+    private PackedScene coinItemScene;
 
     static string ResolvePath(string path)
     {
@@ -156,16 +157,16 @@ public class Map : Node2D
         }
     }
 
-    public void SpawnItemObjects(TileMap layer, ObjectType type, PackedScene objectScene)
+    public void SpawnObjects(TileMap layer, ObjectType type, PackedScene objectScene)
     {
         Godot.Collections.Array cells = layer.GetUsedCellsById((int)type);
         foreach (object cell in cells) {
             Vector2 pos = (Vector2) cell;
             layer.SetCellv(pos, -1);
-            var instance = objectScene.Instance<Item>();
+            var instance = objectScene.Instance<TMXObject>();
             instance.Position = pos * tileSize + tileSize * 0.5f;
             instance.Type = type;
-            AddChild(instance);
+            AddChild(instance as Node);
         }
     }
 
@@ -185,11 +186,18 @@ public class Map : Node2D
     public override void _Ready()
     {
         shovelItemScene = GD.Load<PackedScene>("res://ShovelItem.tscn");
+        coinItemScene = GD.Load<PackedScene>("res://CoinItem.tscn");
 
         LoadTMX("map.tmx");
-        SpawnItemObjects(layers["FG"], ObjectType.Shovel1, shovelItemScene);
-        SpawnItemObjects(layers["FG"], ObjectType.Shovel2, shovelItemScene);
-        SpawnItemObjects(layers["FG"], ObjectType.Shovel3, shovelItemScene);
+        SpawnObjects(layers["FG"], ObjectType.Shovel1, shovelItemScene);
+        SpawnObjects(layers["FG"], ObjectType.Shovel2, shovelItemScene);
+        SpawnObjects(layers["FG"], ObjectType.Shovel3, shovelItemScene);
+        SpawnObjects(layers["FG"], ObjectType.Coin1, coinItemScene);
+        SpawnObjects(layers["FG"], ObjectType.Coin2, coinItemScene);
+        SpawnObjects(layers["FG"], ObjectType.Coin3, coinItemScene);
+        SpawnObjects(layers["FG"], ObjectType.Coin4, coinItemScene);
+        SpawnObjects(layers["FG"], ObjectType.Coin5, coinItemScene);
+        SpawnObjects(layers["FG"], ObjectType.Coin6, coinItemScene);
         SpawnPlayer(layers["FG"], ObjectType.Player);
     }
 

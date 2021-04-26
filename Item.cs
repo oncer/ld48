@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Item : Area2D
+public class Item : Area2D, TMXObject
 {
     // Declare member variables here. Examples:
     // private int a = 2;
@@ -12,6 +12,8 @@ public class Item : Area2D
     private AnimatedSprite sprite;
     private float time;
 
+    private CollisionShape2D collision;
+
     private Game game;
 
     // Called when the node enters the scene tree for the first time.
@@ -19,10 +21,31 @@ public class Item : Area2D
     {
         sprite = GetNode<AnimatedSprite>("AnimatedSprite");
         game = GetNode<Game>("/root/Game");
+        collision = GetNode<CollisionShape2D>("Collision"); 
 
         switch (Type)
         {
             case ObjectType.Player:
+                break;
+            case ObjectType.Coin1:
+                sprite.Play("coin1");
+                (collision.Shape as RectangleShape2D).Extents = new Vector2(4, 4);
+                break;
+            case ObjectType.Coin2:
+                sprite.Play("coin2");
+                (collision.Shape as RectangleShape2D).Extents = new Vector2(5, 5);
+                break;
+            case ObjectType.Coin3:
+                sprite.Play("coin3");
+                break;
+            case ObjectType.Coin4:
+                sprite.Play("coin4");
+                break;
+            case ObjectType.Coin5:
+                sprite.Play("coin5");
+                break;
+            case ObjectType.Coin6:
+                sprite.Play("coin6");
                 break;
             case ObjectType.Shovel1:
                 sprite.Play("shovel1");
@@ -50,26 +73,41 @@ public class Item : Area2D
         Player player = body2D as Player;
         if (player == null) return;
         switch (Type) {
+        case ObjectType.Coin1:
+            player.AcquireCoin(1);
+            break;
+        case ObjectType.Coin2:
+            player.AcquireCoin(5);
+            break;
+        case ObjectType.Coin3:
+            player.AcquireCoin(10);
+            break;
+        case ObjectType.Coin4:
+            player.AcquireCoin(100);
+            break;
+        case ObjectType.Coin5:
+            player.AcquireCoin(200);
+            break;
+        case ObjectType.Coin6:
+            player.AcquireCoin(1000);
+            break;
         case ObjectType.Shovel1:
             player.ShovelPower = 1;
             game.ShowTutorialText("Dig down!");
-            Globals.CreateEffect("takeItem", Position);
             GD.Print("Acquired shovel 1!");
-            QueueFree();
             break;
         case ObjectType.Shovel2:
             player.ShovelPower = 2;
-            Globals.CreateEffect("takeItem", Position);
             GD.Print("Acquired shovel 2!");
-            QueueFree();
             break;
         case ObjectType.Shovel3:
             player.ShovelPower = 3;
-            Globals.CreateEffect("takeItem", Position);
             GD.Print("Acquired shovel 3!");
-            QueueFree();
             break;
         }
+
+        Globals.CreateEffect("takeItem", Position);
+        QueueFree();
     }
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
