@@ -103,7 +103,7 @@ public class Enemy : KinematicBody2D, TMXObject
     {
         xDir = 1;
         Velocity = Vector2.Zero;
-        sprite = GetNode<AnimatedSprite>("Sprite");
+        sprite = GetNode<AnimatedSprite>("AnimatedSprite");
         map = GetNode<Map>("..");
         edgeDetector = GetNodeOrNull<Node2D>("EdgeDetector");
         debug = GetNodeOrNull<Label>("Debug");
@@ -122,9 +122,9 @@ public class Enemy : KinematicBody2D, TMXObject
         case ObjectType.Spike:
             sprite.Play("spike");
             break;
-        case ObjectType.Trap:
-            sprite.Play("trap");
-            break;
+        //case ObjectType.Trap:
+        //    sprite.Play("trap");
+        //    break;
         }
     }
 
