@@ -155,7 +155,7 @@ public class Player : KinematicBody2D
                 }
 
                 // dig side
-                if (ShovelPower >= 1 && /*onGround &&*/ /*Input.IsActionPressed("ui_down") &&*/ (Input.IsActionPressed("ui_right") || Input.IsActionPressed("ui_left")))
+                if (ShovelPower >= 1 && /*onGround &&*/ /*Input.IsActionPressed("ui_down") &&*/ moveInput != 0)
                 {
                     if (CanDigDirection(Direction == Direction.Left ? Vector2.Left : Vector2.Right))
                     {
@@ -296,7 +296,7 @@ public class Player : KinematicBody2D
     private bool CanClearTileAt(Vector2 digPoint)
     {
         var tileType = map.GetEarthTileAt(digPoint);
-        if (tileType == EarthTileType.Unknown)
+        if (tileType == EarthTileType.Unknown || tileType == EarthTileType.Empty)
             return false;
 
         return ((int)tileType <= ShovelPower);
