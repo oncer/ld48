@@ -190,6 +190,7 @@ public class Map : Node2D
             GD.Print("player cell found!");
             layer.SetCellv((Vector2) cell, -1);
             ply.Position = (Vector2) cell * tileSize + tileSize * 0.5f;
+            ply.SpawnPosition = ply.Position;
             break;
         }
     }
