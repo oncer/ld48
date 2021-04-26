@@ -14,7 +14,7 @@ public class Player : KinematicBody2D
     private float dragX = .7f;
     private const float accX = 20f;
     private Camera2D camera;
-    private Vector2 velocity = new Vector2(0.0f, 0.0f);
+    public Vector2 Velocity = Vector2.Zero;
     private const float GravityDefault = 700.0f;
     private const float GravityJump = 400.0f;
     private float gravity = GravityDefault;
@@ -233,9 +233,9 @@ public class Player : KinematicBody2D
 
         animatedSprite.FlipH = (Direction == Direction.Left);
 
-        velocity.x = speedX;
+        Velocity.x = speedX;
         speedY += gravity * delta;
-        velocity.y = speedY;
+        Velocity.y = speedY;
 
         Vector2 direction = new Vector2(0.0f, 0.0f); // TODO input goes here
         Vector2 snapVector = Vector2.Zero;
@@ -249,7 +249,7 @@ public class Player : KinematicBody2D
         var collision = GetNode<CollisionShape2D>("Collision");
         collision.Disabled = State == PlayerState.Die;
 
-        velocity = MoveAndSlide(velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
+        Velocity = MoveAndSlide(Velocity, Vector2.Up, !isOnPlatform, 4, 0.9f, false);
 
         if (isOnWall) speedX = 0;
         if (isOnCeil) speedY = Math.Max(speedY, 0);
