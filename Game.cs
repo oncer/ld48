@@ -31,7 +31,9 @@ public class Game : Node2D
 		player = GetNode<Player>("Map/Player");
 		scoreText = GetNode<Label>("CanvasLayer/ScoreHUD/ScoreText");
 		player.State = PlayerState.Idle;
-		var fadeAnim = GetNode<AnimationPlayer>("CanvasLayer/Z/FadeRect/AnimationPlayer");
+		var fadeRect = GetNode<ColorRect>("CanvasLayer/Z/FadeRect");
+		fadeRect.Visible = true;
+		var fadeAnim = fadeRect.GetNode<AnimationPlayer>("AnimationPlayer");
 		fadeAnim.Play("FadeIn");
 
 		Sfx = GetNode<SFX>("SFX");

@@ -181,9 +181,10 @@ __meta__ = {
 z_index = 4
 
 [node name="FadeRect" type="ColorRect" parent="CanvasLayer/Z"]
+visible = false
 margin_right = 320.0
 margin_bottom = 192.0
-color = Color( 0, 0, 0, 0 )
+color = Color( 0, 0, 0, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -202,28 +203,31 @@ script = ExtResource( 17 )
 
 [node name="Dig1" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 14 )
+volume_db = -4.415
 
 [node name="Dig2" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 12 )
+volume_db = -4.415
 
 [node name="Dig3" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 12 )
+volume_db = -4.415
 
 [node name="Coin1" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 13 )
-volume_db = -5.887
+volume_db = -6.868
 
 [node name="Coin2" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 15 )
-volume_db = -5.396
+volume_db = -6.377
 
 [node name="Coin3" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 10 )
-volume_db = -5.396
+volume_db = -6.377
 
 [node name="Coin4" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 11 )
-volume_db = -5.397
+volume_db = -6.378
 
 [node name="Death" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource( 16 )
