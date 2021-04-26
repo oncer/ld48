@@ -2,7 +2,7 @@ using Godot;
 using System;
 using static Globals;
 
-public class DestroyEffect : Node2D
+public class Effect : Node2D
 {
     private AnimatedSprite animatedSprite;
 
