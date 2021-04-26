@@ -40,7 +40,17 @@ public class Player : KinematicBody2D
     private float dieTutorialTimer = 0;
     private bool suicideHappened = false;
 
+    private AnimationPlayer fadeAnim;
+
     private Game game;
+
+    public void OnAnimationPlayerAnimationFinished(string name)
+    {
+        if (name == "QuickFadeOut") {
+            Position = SpawnPosition;
+            fadeAnim.Play("QuickFadeIn");
+        }
+    }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -55,19 +65,28 @@ public class Player : KinematicBody2D
         map = GetNode<Map>("..");
         debugText = GetNode<Label>("Z/DebugText");
 
+        fadeAnim = GetNode<AnimationPlayer>("../../CanvasLayer/Z/FadeRect/AnimationPlayer");
+
         animatedSprite.Connect("animation_finished", this, "OnFinished");
         SpawnPosition = Position;
     }
 
+    public void AcquireShovel(int level)
+    {
+        ShovelPower = level;
+        game.Sfx.GetShovel();
+    }
+
     public void AcquireCoin(int value)
     {
-        GD.Print("Acquired coin with value " + value);
+        game.Sfx.Coin();
         Score += value;
         game.UpdateScoreText();
     }
 
     public void Kill()
     {
+        game.Sfx.Death();
         speedX = 0;
         speedY = 0;
         State = PlayerState.Die;
@@ -246,7 +265,10 @@ public class Player : KinematicBody2D
                 hasJumped = false;
                 hitHead = false;
 
-                Position = SpawnPosition;
+                fadeAnim.Play("QuickFadeOut");
+
+                //GD.Print("SpawnPosition 1 " + SpawnPosition);
+                //Position = SpawnPosition;
             }
         }
 
@@ -338,6 +360,7 @@ public class Player : KinematicBody2D
     {
         Vector2 digPoint = GetDigPoint(dir);
         if (CanClearTileAt(digPoint)) {
+            game.Sfx.Dig();
             ClearTileAt(digPoint);
             if (dir == Vector2.Down && firstDig)
             {

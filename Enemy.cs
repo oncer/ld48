@@ -23,9 +23,11 @@ public class Enemy : KinematicBody2D, TMXObject
 
     private Label debug;
 
+    private Game game;
 
     public void Kill()
     {
+        game.Sfx.EnemyDeath();
         Globals.CreateEffect("destroyEnemy", Position);
         QueueFree();
     }
@@ -103,6 +105,7 @@ public class Enemy : KinematicBody2D, TMXObject
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        game = GetNode<Game>("/root/Game");
         xDir = 1;
         Velocity = Vector2.Zero;
         sprite = GetNode<AnimatedSprite>("AnimatedSprite");

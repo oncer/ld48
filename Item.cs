@@ -92,16 +92,16 @@ public class Item : Area2D, TMXObject
             player.AcquireCoin(1000);
             break;
         case ObjectType.Shovel1:
-            player.ShovelPower = 1;
+            player.AcquireShovel(1);
             game.ShowTutorialText("Dig down!");
             GD.Print("Acquired shovel 1!");
             break;
         case ObjectType.Shovel2:
-            player.ShovelPower = 2;
+            player.AcquireShovel(2);
             GD.Print("Acquired shovel 2!");
             break;
         case ObjectType.Shovel3:
-            player.ShovelPower = 3;
+            player.AcquireShovel(3);
             GD.Print("Acquired shovel 3!");
             break;
         }

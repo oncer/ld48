@@ -11,7 +11,18 @@ public class Game : Node2D
 	private Player player;
 	private Label scoreText;
 
+	public SFX Sfx{get;set;}
+
 	private TutorialText tutorialText;
+
+
+    public void OnAnimationPlayerAnimationFinished(string name)
+	{
+		if (name == "FadeIn") {
+			var music = GetNode<AudioStreamPlayer>("Music");
+			music.Play();
+		}
+	}
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -20,9 +31,10 @@ public class Game : Node2D
 		player = GetNode<Player>("Map/Player");
 		scoreText = GetNode<Label>("CanvasLayer/ScoreHUD/ScoreText");
 		player.State = PlayerState.Idle;
+		var fadeAnim = GetNode<AnimationPlayer>("CanvasLayer/Z/FadeRect/AnimationPlayer");
+		fadeAnim.Play("FadeIn");
 
-		//var music = GetNode<AudioStreamPlayer>("Music");
-		//music.Play();
+		Sfx = GetNode<SFX>("SFX");
 
 		ShowTutorialText("Find the shovel!");
 	}
