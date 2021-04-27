@@ -18,7 +18,7 @@ public class Intro : Node2D
     public override void _Input(InputEvent ev)
     {
         if ((ev is InputEventKey && ev.IsPressed())
-            || (ev is InputEventMouse && ev.IsPressed())) {
+            || (ev is InputEventMouse && (ev as InputEventMouse).ButtonMask == 1 && ev.IsPressed())) {
                 if (animationState == 1) {
                     animation.Play("FadeOut");
                 }
